@@ -48,8 +48,8 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/",
-              "deployUrl": "./"
+              "baseHref": "/browser/",
+              "deployUrl": "browser/"
             },
             "development": {
               "optimization": false,
