@@ -24,6 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Reemplazar BACKEND_URI en environment.prod.ts
+        run: |
+         sed -i "s|BACKEND_URI_PLACEHOLDER|${{ secrets.BACKEND_URI }}|g" src/environments/environment.prod.ts
+
+
       - name: Build Angular app
         run: npm run-script build-prod
 

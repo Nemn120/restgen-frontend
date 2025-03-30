@@ -22,6 +22,7 @@
     "strictPropertyInitialization": false,
     "lib": ["ES2022", "dom"],
     "resolveJsonModule": true,
+    "strictNullChecks": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

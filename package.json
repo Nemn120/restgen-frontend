@@ -25,6 +25,7 @@
     "@angular/platform-server": "^19.1.0",
     "@angular/router": "^19.1.0",
     "@angular/ssr": "^19.1.5",
+    "@auth0/angular-jwt": "^5.2.0",
     "@ngx-translate/core": "^16.0.4",
     "angular-tabler-icons": "^3.26.0",
     "apexcharts": "^3.40.0",
