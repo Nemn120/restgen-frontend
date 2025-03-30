@@ -6,28 +6,31 @@
           <div class="text-center">
             RestGen
           </div>
-          <form class="m-t-30">
+          <form [formGroup]="form" class="m-t-30">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Username</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput />
-            </mat-form-field>
-            <!-- password -->
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Password</mat-label>
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput type="password" />
+              <input matInput formControlName="uname" required />
             </mat-form-field>
 
-            <a [routerLink]="['/']" mat-flat-button color="primary" class="w-100">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Password</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput type="password" formControlName="password" required />
+            </mat-form-field>
+
+            <button (click)="submit()" mat-flat-button color="primary" class="w-100" [disabled]="form.invalid">
               Sign In
-            </a>
-            <!-- input -->
+            </button>
           </form>
-          <span class="d-block f-w-500 text-center m-t-24">New to RestGen?
+
+          <span class="d-block f-w-500 text-center m-t-24">
+            New to RestGen?
             <a [routerLink]="['/authentication/register']" class="text-decoration-none text-primary f-w-500 f-s-14">
-              Create an account</a>
+              Create an account
+            </a>
           </span>
         </mat-card-content>
       </mat-card>
+
     </div>
   </div>
 </div>

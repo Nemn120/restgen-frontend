@@ -18,7 +18,8 @@
   </button>
   <mat-menu #profilemenu="matMenu" class="topbar-dd cardWithShadow">
     <div class="p-x-12 m-t-12">
-      <a [routerLink]="['/authentication/login']" mat-stroked-button class="w-100">Logout</a>
+      {{this.email}}
+      <a (click)="logout()" mat-stroked-button class="w-100">Logout</a>
     </div>
   </mat-menu>
 </mat-toolbar>
