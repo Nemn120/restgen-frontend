@@ -31,7 +31,9 @@
               "src/assets/scss/style.scss"
             ],
             "scripts": [],
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "deployUrl": "/browser/",
+            "baseHref": "/browser/"
           },
           "configurations": {
             "production": {
@@ -48,8 +50,8 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/",
-              "deployUrl": "browser/"
+              "deployUrl": "/browser/",
+              "baseHref": "/browser/"
             },
             "development": {
               "optimization": false,
