@@ -4,6 +4,7 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EMPTY, Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
+import { AppError } from '../models/app-error.model';
 
 @Injectable({providedIn: 'root'})
 export class HttpService {
@@ -22,7 +23,7 @@ export class HttpService {
 
     param(key: string, value: string): this {
         if (value != null) {
-            this.params = this.params.append(key, value); // This class is immutable
+            this.params = this.params.append(key, value);
         }
         return this;
     }
@@ -89,7 +90,7 @@ export class HttpService {
 
     header(key: string, value: string): HttpService {
         if (value != null) {
-            this.headers = this.headers.append(key, value); // This class is immutable
+            this.headers = this.headers.append(key, value);
         }
         return this;
     }
@@ -124,7 +125,7 @@ export class HttpService {
                 const blob = new Blob([response.body], {type: 'application/pdf'});
                 window.open(window.URL.createObjectURL(blob));
             } else if (contentType.indexOf('application/json') !== -1) {
-                return response.body; // with 'text': JSON.parse(response.body);
+                return response.body;
             }
         } else {
             return response;
@@ -141,7 +142,7 @@ export class HttpService {
     }
 
     private handleError(response:any): any {
-        let error: any;
+        let error: AppError;
         if (response.status === HttpService.UNAUTHORIZED) {
             this.showError('Unauthorized');
             this.router.navigate(['']).then();
@@ -151,7 +152,7 @@ export class HttpService {
             return EMPTY;
         } else {
             try {
-                error = response.error; // with 'text': JSON.parse(response.error);
+                error = response.error;
                 this.showError(error.error + ' (' + response.status + '): ' + error.message);
                 return throwError(() => error);
             } catch (e) {

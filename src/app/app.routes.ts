@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
+import { RoleGuardService } from './services/role-guard.service';
+import { Role } from './models/role.model';
+
 
 export const routes: Routes = [
   {
@@ -14,6 +17,8 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
+        canActivate: [RoleGuardService],
+        data: { roles: [Role.ADMIN, Role.DEVELOPER] },
         loadChildren: () =>
           import('./pages/pages.routes').then((m) => m.PagesRoutes),
       },
