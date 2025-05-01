@@ -6,25 +6,25 @@
           <div class="text-center">
             RestGen
           </div>
-          <form class="m-t-30">
+          <form [formGroup]="form" class="m-t-30">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Name</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput />
+              <input matInput formControlName="uname" required/>
             </mat-form-field>
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email Adddress</mat-label>
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email address</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput type="email" />
+              <input matInput type="email" formControlName="email" required/>
             </mat-form-field>
             <!-- password -->
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Password</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput type="password" />
+              <input matInput type="password" formControlName="password" required/>
             </mat-form-field>
 
-            <a [routerLink]="['/']" mat-flat-button color="primary" class="w-100">
+            <button (click)="submit()" mat-flat-button color="primary" class="w-100" [disabled]="form.invalid">
               Sign Up
-            </a>
-            <!-- input -->
+            </button>
+
           </form>
           <span class="d-block f-w-500 text-center m-t-24">Already have an Account?
 
