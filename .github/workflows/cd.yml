@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+
 permissions:
   id-token: write
   contents: read
@@ -21,13 +22,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Install dependencies
         run: npm install
 
       - name: Reemplazar BACKEND_URI en environment.prod.ts
         run: |
-         sed -i "s|BACKEND_URI_PLACEHOLDER|${{ secrets.BACKEND_URI }}|g" src/environments/environment.prod.ts
-         echo "BACKEND_URI=${{ secrets.BACKEND_URI }}" >> $GITHUB_ENV
+          sed -i "s|BACKEND_URI_PLACEHOLDER|${{ secrets.BACKEND_URI }}|g" src/environments/environment.prod.ts || { echo "Placeholder no encontrado"; exit 1; }
+          echo "BACKEND_URI=${{ secrets.BACKEND_URI }}" >> $GITHUB_ENV
+
+      - name: Verificar contenido de environment.prod.ts
+        run: cat src/environments/environment.prod.ts
+
+      - name: Validar reemplazo en environment.prod.ts
+        run: |
+          if ! grep -q "${{ secrets.BACKEND_URI }}" src/environments/environment.prod.ts; then
+            echo "El placeholder no fue reemplazado correctamente."
+            exit 1
+          fi
 
       - name: Build Angular app
         run: npm run-script build-prod
