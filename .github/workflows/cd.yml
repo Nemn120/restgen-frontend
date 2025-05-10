@@ -27,7 +27,7 @@ jobs:
       - name: Reemplazar BACKEND_URI en environment.prod.ts
         run: |
          sed -i "s|BACKEND_URI_PLACEHOLDER|${{ secrets.BACKEND_URI }}|g" src/environments/environment.prod.ts
-
+         echo "BACKEND_URI=${{ secrets.BACKEND_URI }}" >> $GITHUB_ENV
 
       - name: Build Angular app
         run: npm run-script build-prod
