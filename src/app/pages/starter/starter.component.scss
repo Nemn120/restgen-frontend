@@ -1,0 +1,30 @@
+.descripcion-columna {
+  min-width: 200px;
+  max-width: 400px;
+  width: 100%;
+  flex: 2 1 0%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-form-field {
+    width: 100%;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.title-card-main {
+  padding: 2px 12px !important;
+  width: 100%;
+  display: block;
+}

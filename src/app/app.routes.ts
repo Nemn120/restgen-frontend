@@ -12,11 +12,11 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/dashboard',
+        redirectTo: '/project',
         pathMatch: 'full',
       },
       {
-        path: 'dashboard',
+        path: 'project',
         canActivate: [RoleGuardService],
         data: { roles: [Role.ADMIN, Role.DEVELOPER] },
         loadChildren: () =>

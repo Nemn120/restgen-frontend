@@ -1,0 +1,20 @@
+
+
+<div *ngIf="this.plantUML">
+
+<div id="diagramView" style="display: flex; flex-direction: column; align-items: center">
+  <img id="diagram" class="img-fluid" data-wheel-zoom="" [src]=diagramRoute
+       alt="This member is too big for PlantUML to draw a diagram." width="90%" height="100%">
+  <!-- <div style="display: flex; flex-direction: row; align-items: center">
+    <a [href]="svgFileUrl" download="diagram.svg">
+    <span class="btn"><em class="fa fa-download"></em> Download as SVG</span>
+    </a>
+    <a [href]="pngFileUrl" download="diagram.png">
+    <span class="btn"><em class="fa fa-download"></em> Download as PNG</span>
+    </a>
+    <span (click)="openDialog()" class="material-icons" style="cursor: pointer;">
+      fullscreen
+    </span>
+  </div> -->
+</div>
+</div>

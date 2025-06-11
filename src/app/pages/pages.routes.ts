@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { StarterComponent } from './starter/starter.component';
+import { ProjectComponent } from './starter/project/project.component';
 
 export const PagesRoutes: Routes = [
   {
@@ -8,9 +9,15 @@ export const PagesRoutes: Routes = [
     data: {
       title: 'Starter',
       urls: [
-        { title: 'Dashboard', url: '/dashboard' },
+        { title: 'Proyectos', url: '/project' },
         { title: 'Starter' },
       ],
     },
   },
+  {
+    path: 'new', component: ProjectComponent,
+  },
+  {
+    path: 'edit/:id', component: ProjectComponent
+  }
 ];

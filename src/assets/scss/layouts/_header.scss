@@ -4,9 +4,7 @@ html .topbar {
   position: sticky;
   top: 0;
   z-index: 9;
-  height: $header-height;
   background-color: var(--mat-sys-background);
-
   i-tabler {
     stroke-width: 1.5px;
   }

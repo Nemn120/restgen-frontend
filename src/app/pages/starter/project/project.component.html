@@ -1,0 +1,163 @@
+<mat-card>
+  <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
+  <span style="padding-left: 20px">{{ title }}</span>
+  <span style="display: flex; gap: 8px;">
+    <button mat-stroked-button color="primary" (click)="generate()">Generar</button>
+    <button mat-stroked-button color="accent" (click)="download()">Descargar</button>
+    <button mat-stroked-button color="warn" (click)="uploadGithub()">Subir a GitHub</button>
+    <button mat-stroked-button color="primary" (click)="entities()">Entidades</button>
+    <button mat-stroked-button color="basic" (click)="cancelar()">Regresar</button>
+  </span>
+</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="projectForm">
+      <!-- Datos principales -->
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name" required>
+        <mat-error *ngIf="projectForm.get('name')?.hasError('required')">Campo requerido</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description" required></textarea>
+        <mat-error *ngIf="projectForm.get('description')?.hasError('required')">Campo requerido</mat-error>
+      </mat-form-field>
+
+      <!-- <mat-form-field appearance="fill" style="width: 100%;" visible="false">
+        <mat-label>Repositorio</mat-label>
+        <input matInput formControlName="urlRepository">
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="width: 100%;" visible="false">
+        <mat-label>PlantUML Diagram</mat-label>
+        <input matInput formControlName="plantUmlDiagram">
+      </mat-form-field> -->
+      <div style="display: flex; gap: 16px;">
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Estado</mat-label>
+          <input matInput formControlName="status" readonly="true">
+        </mat-form-field>
+        <mat-checkbox formControlName="isPrivate">Privado</mat-checkbox>
+      </div>
+
+
+      <div [formGroupName]="'properties'">
+        <!-- Application -->
+        <h3>Propiedades de Aplicación</h3>
+        <div [formGroupName]="'application'" style="display: flex; gap: 16px;">
+          <mat-form-field appearance="fill" style="flex:1;">
+            <mat-label>Ruta base</mat-label>
+            <input matInput formControlName="basePath">
+          </mat-form-field>
+          <mat-form-field appearance="fill" style="flex:1;">
+            <mat-label>Puerto</mat-label>
+            <input matInput type="number" formControlName="port">
+          </mat-form-field>
+        </div>
+
+        <!-- Maven -->
+        <h3>Maven</h3>
+        <div [formGroupName]="'maven'" style="display: flex; gap: 16px;">
+          <mat-form-field appearance="fill" style="flex:1;">
+            <mat-label>GroupId</mat-label>
+            <input matInput formControlName="groupId">
+          </mat-form-field>
+          <mat-form-field appearance="fill" style="flex:1;">
+            <mat-label>ArtifactId</mat-label>
+            <input matInput formControlName="artifactId">
+          </mat-form-field>
+          <mat-form-field appearance="fill" style="flex:1;">
+            <mat-label>Versión</mat-label>
+            <input matInput formControlName="version">
+          </mat-form-field>
+        </div>
+
+        <!-- Seguridad -->
+        <h3>Seguridad</h3>
+        <div [formGroupName]="'security'" style="display: flex; gap: 16px;">
+          <mat-form-field appearance="fill" style="flex:1;">
+            <mat-label>Secret Key</mat-label>
+            <input matInput formControlName="secretKey">
+          </mat-form-field>
+        </div>
+
+        <!-- Documentation -->
+        <h3>Documentación</h3>
+        <div [formGroupName]="'documentation'">
+          <div style="display: flex; gap: 16px;">
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Título</mat-label>
+              <input matInput formControlName="title">
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Versión</mat-label>
+              <input matInput formControlName="version">
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description"></textarea>
+          </mat-form-field>
+          <!-- Agrupa los campos de contacto en una línea -->
+          <div style="display: flex; gap: 16px;">
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Nombre de Contacto</mat-label>
+              <input matInput formControlName="contactName">
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>URL de Contacto</mat-label>
+              <input matInput formControlName="contactUrl">
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Email de Contacto</mat-label>
+              <input matInput formControlName="contactEmail">
+            </mat-form-field>
+          </div>
+
+          <!-- Agrupa los campos de licencia en otra línea -->
+          <div style="display: flex; gap: 16px;">
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Nombre de Licencia</mat-label>
+              <input matInput formControlName="licenseName">
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>URL de Licencia</mat-label>
+              <input matInput formControlName="licenseUrl">
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>URL Términos de Servicio</mat-label>
+              <input matInput formControlName="termsOfServiceUrl">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <h3>Auditoria</h3>
+      <div style="display: flex; gap: 16px; margin-top: 16px;">
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Usuario creación</mat-label>
+          <input matInput formControlName="creationUser" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Fecha creación</mat-label>
+          <input matInput formControlName="creationDate" type="datetime-local" readonly>
+        </mat-form-field>
+      </div>
+      <div style="display: flex; gap: 16px;">
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Usuario actualización</mat-label>
+          <input matInput formControlName="updateUser" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Fecha actualización</mat-label>
+          <input matInput formControlName="updateDate" type="datetime-local" readonly>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <div style="display: flex; justify-content: center; gap: 8px;">
+      <button mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
+      <button mat-raised-button class="bg-light-error" (click)="cancelar()" type="button">Cancelar</button>
+    </div>
+  </mat-card-actions>
+</mat-card>
