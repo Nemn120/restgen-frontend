@@ -37,5 +37,16 @@ export class ProjectService {
       });
   }
 
+  public delete(uuid: string) {
+    return this.http.delete(`${ProjectService.END_POINT}/${uuid}`);
+  }
+
+  public generate(uuid: string) {
+    let body = {
+      id: uuid
+    };
+    return this.http.patch(`${ProjectService.END_POINT}/${uuid}/generate`, body, { responseType: 'text' });
+  }
+
 
 }

@@ -30,4 +30,9 @@ html {
     .mdc-switch__handle:has(.mdc-switch__icons) {
     margin: 0 26px;
   }
+
+  .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background: #f8fcff !important;
+    border-radius: 3px;
+  }
 }

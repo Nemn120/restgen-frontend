@@ -2,21 +2,37 @@
   <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
   <span style="padding-left: 20px">{{ title }}</span>
   <span style="display: flex; gap: 8px;">
-    <button mat-stroked-button color="primary" (click)="generate()">Generar</button>
-    <button mat-stroked-button color="accent" (click)="download()">Descargar</button>
-    <button mat-stroked-button color="warn" (click)="uploadGithub()">Subir a GitHub</button>
-    <button mat-stroked-button color="primary" (click)="entities()">Entidades</button>
-    <button mat-stroked-button color="basic" (click)="cancelar()">Regresar</button>
+    <button mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
+    @if (projectId) {
+      @if(this.existsClass) {
+        <button mat-raised-button class="bg-light-secondary" (click)="generate()">Generar</button>
+        @if(this.status === 'GENERATED') {
+        <button mat-raised-button (click)="download()">Descargar</button>
+        <button mat-raised-button class="bg-light-warning" (click)="uploadGithub()">Subir a GitHub</button>
+        }
+      }
+      <button mat-raised-button (click)="entities()">Entidades</button>
+    }
+    <button mat-raised-button class="bg-light-error" (click)="cancelar()">Regresar</button>
   </span>
 </mat-card-title>
   <mat-card-content>
     <form [formGroup]="projectForm">
       <!-- Datos principales -->
-      <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Nombre</mat-label>
-        <input matInput formControlName="name" required>
-        <mat-error *ngIf="projectForm.get('name')?.hasError('required')">Campo requerido</mat-error>
-      </mat-form-field>
+      <div style="display: flex; gap: 16px;">
+        <mat-form-field appearance="fill" style="flex: 1;">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" required>
+          <mat-error *ngIf="projectForm.get('name')?.hasError('required')">Campo requerido</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Estado</mat-label>
+          <input matInput formControlName="status" readonly="true">
+        </mat-form-field>
+        <mat-checkbox formControlName="isPrivate">Privado</mat-checkbox>
+      </div>
+
+
       <mat-form-field appearance="fill" style="width: 100%;">
         <mat-label>Descripción</mat-label>
         <textarea matInput formControlName="description" required></textarea>
@@ -31,13 +47,7 @@
         <mat-label>PlantUML Diagram</mat-label>
         <input matInput formControlName="plantUmlDiagram">
       </mat-form-field> -->
-      <div style="display: flex; gap: 16px;">
-        <mat-form-field appearance="fill" style="flex:1;">
-          <mat-label>Estado</mat-label>
-          <input matInput formControlName="status" readonly="true">
-        </mat-form-field>
-        <mat-checkbox formControlName="isPrivate">Privado</mat-checkbox>
-      </div>
+
 
 
       <div [formGroupName]="'properties'">
@@ -154,10 +164,4 @@
       </div>
     </form>
   </mat-card-content>
-  <mat-card-actions>
-    <div style="display: flex; justify-content: center; gap: 8px;">
-      <button mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
-      <button mat-raised-button class="bg-light-error" (click)="cancelar()" type="button">Cancelar</button>
-    </div>
-  </mat-card-actions>
 </mat-card>

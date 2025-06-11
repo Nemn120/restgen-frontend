@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MessageService } from 'src/app/services/message.service';
+import { DialogoConfirmacionComponent } from 'src/app/_shared/dialogo-confirmacion/dialogo-confirmacion.component';
 
 @Component({
   selector: 'app-starter',
@@ -50,7 +52,9 @@ export class StarterComponent implements OnInit {
   constructor(
     private router: Router,
     private dialog: MatDialog,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private messageService: MessageService
+
   ) {}
 
   ngOnInit(): void {
@@ -79,11 +83,29 @@ export class StarterComponent implements OnInit {
   }
 
   deleteProject(project: Proyect) {
-    // Aquí puedes abrir un diálogo de confirmación si lo deseas
-    // Por simplicidad, solo mostramos el esqueleto
-    if (confirm('¿Está seguro de eliminar este proyecto?')) {
-      // Lógica para eliminar el proyecto
-      // this.projectService.delete(project.id).subscribe(...)
-    }
+    const params = {
+          title: 'Eliminar proyecto',
+          description: '¿Está seguro de eliminar el proyecto?',
+          inputData: true
+        };
+        this.dialog.open(DialogoConfirmacionComponent, {
+          data: params, hasBackdrop: false
+        })
+          .afterClosed()
+          .subscribe(confirmado => {
+            if (confirmado) {
+              this.projectService.delete(project.id).subscribe({
+                next: () => {
+                  this.messageService.message('Proyecto eliminado correctamente', 'success');
+                  this.listProject();
+                },
+                error: () => {
+                  this.messageService.message('Error al eliminar el proyecto', 'error');
+                }
+              });
+            }
+          }
+
+    );
   }
 }

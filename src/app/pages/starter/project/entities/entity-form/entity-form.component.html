@@ -1,0 +1,156 @@
+<mat-card>
+  <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
+    <span style="padding-left: 20px">{{ editMode ? 'Editar Entidad' : 'Nueva Entidad' }}</span>
+  </mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="entityForm">
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Nombre de la Entidad</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <div formGroupName="entity">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Nombre de la Tabla</mat-label>
+          <input matInput formControlName="tableName">
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Extiende de</mat-label>
+          <input matInput formControlName="extendsClass">
+        </mat-form-field>
+
+        <!-- Opciones -->
+        <h4>Opciones</h4>
+        <div formGroupName="options">
+          <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Estrategia de Herencia</mat-label>
+            <input matInput formControlName="inheritanceStrategy">
+          </mat-form-field>
+
+          <!-- Unique Constraints -->
+          <div>
+            <label>Restricciones Únicas</label>
+            <div formArrayName="uniqueConstraints" style="display: flex; flex-direction: column; gap: 8px;">
+              <div *ngFor="let uc of uniqueConstraints.controls; let i = index" style="display: flex; gap: 8px;">
+                <mat-form-field appearance="fill" style="flex:1;">
+                  <input matInput [formControlName]="i" placeholder="Campo único">
+                </mat-form-field>
+                <button mat-icon-button color="warn" (click)="removeUniqueConstraint(i)" type="button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-button color="primary" (click)="addUniqueConstraint()" type="button">Agregar
+                restricción</button>
+            </div>
+          </div>
+
+          <!-- Discriminator -->
+          <h5>Discriminador</h5>
+          <div formGroupName="discriminator" style="display: flex; gap: 16px;">
+            <div formGroupName="column" style="flex:2;">
+              <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Nombre columna</mat-label>
+                <input matInput formControlName="name">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Tipo columna</mat-label>
+                <input matInput formControlName="type">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Longitud</mat-label>
+                <input matInput type="number" formControlName="length">
+              </mat-form-field>
+            </div>
+            <div formGroupName="options" style="flex:1;">
+              <mat-checkbox formControlName="force">Forzar</mat-checkbox>
+              <mat-checkbox formControlName="insert">Insertar</mat-checkbox>
+            </div>
+          </div>
+
+          <!-- Sequence -->
+          <h5>Secuencia</h5>
+          <div formGroupName="sequence" style="display: flex; gap: 16px;">
+            <mat-checkbox formControlName="create">Crear secuencia</mat-checkbox>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="name">
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="flex:1;">
+              <mat-label>Incremento</mat-label>
+              <input matInput type="number" formControlName="increment">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Columnas -->
+        <h4>Columnas</h4>
+        <div formArrayName="columns">
+          <div *ngFor="let column of columns.controls; let i = index" [formGroupName]="i"
+            style="border: 1px solid #eee; margin-bottom: 12px; padding: 8px; border-radius: 6px;">
+            <div formGroupName="property" style="display: flex; gap: 8px;">
+              <mat-form-field appearance="fill" style="flex:2;">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="name">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:2;">
+                <mat-label>Tipo</mat-label>
+                <input matInput formControlName="type">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Visibilidad</mat-label>
+                <mat-select formControlName="visibility">
+                  <mat-option value="PUBLIC">PUBLIC</mat-option>
+                  <mat-option value="PROTECTED">PROTECTED</mat-option>
+                  <mat-option value="PRIVATE">PRIVATE</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div formGroupName="column" style="display: flex; gap: 8px;">
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Nombre columna</mat-label>
+                <input matInput formControlName="name">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Longitud</mat-label>
+                <input matInput type="number" formControlName="length">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Precisión</mat-label>
+                <input matInput type="number" formControlName="precision">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Escala</mat-label>
+                <input matInput type="number" formControlName="scale">
+              </mat-form-field>
+              <mat-checkbox formControlName="unique">Único</mat-checkbox>
+              <mat-checkbox formControlName="foreignkey">Foránea</mat-checkbox>
+              <mat-checkbox formControlName="nullable">Nulo</mat-checkbox>
+            </div>
+            <div formGroupName="relation" style="display: flex; gap: 8px;">
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Tipo relación</mat-label>
+                <input matInput formControlName="type">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Fetch</mat-label>
+                <input matInput formControlName="fetch">
+              </mat-form-field>
+              <mat-form-field appearance="fill" style="flex:1;">
+                <mat-label>Join Column Referenced</mat-label>
+                <input matInput formControlName="joinColumnReferenced">
+              </mat-form-field>
+              <mat-checkbox formControlName="notAudited">No auditar</mat-checkbox>
+            </div>
+            <button mat-icon-button color="warn" (click)="removeColumn(i)" type="button">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-button color="primary" (click)="addColumn()" type="button">Agregar columna</button>
+      </div>
+      <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: center;">
+        <button mat-raised-button color="primary" (click)="saveEntity()" type="button">Guardar</button>
+        <button mat-button (click)="cancel()" type="button">Cancelar</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
