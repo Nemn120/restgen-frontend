@@ -45,7 +45,7 @@ export class ProjectService {
     let body = {
       id: uuid
     };
-    return this.http.patch(`${ProjectService.END_POINT}/${uuid}/generate`, body, { responseType: 'text' });
+    return this.http.patch(`${ProjectService.END_POINT}/generate`, body, { responseType: 'text' });
   }
 
 

@@ -75,6 +75,7 @@ export interface EntityOptions {
   uniqueConstraints?: string[];
   discriminator?: Discriminator;
   sequence?: Sequence;
+  isAudited?: boolean;
 }
 
 export interface Discriminator {

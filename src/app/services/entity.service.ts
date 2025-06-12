@@ -21,11 +21,7 @@ export class EntityService {
   }
 
   create(projectId: string, entity: any) {
-    return this.http.post<any>(`${EntityService.END_POINT}/${projectId}`, entity);
-  }
-
-  update(projectId: string, entityId: string, entity: any) {
-    return this.http.put<any>(`${EntityService.END_POINT}/${projectId}/${entityId}`, entity);
+    return this.http.post<any>(`${EntityService.END_POINT}/project/${projectId}`, entity);
   }
 
   delete(projectId: string, entityId: string) {

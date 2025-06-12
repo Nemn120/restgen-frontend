@@ -39,17 +39,6 @@
         <mat-error *ngIf="projectForm.get('description')?.hasError('required')">Campo requerido</mat-error>
       </mat-form-field>
 
-      <!-- <mat-form-field appearance="fill" style="width: 100%;" visible="false">
-        <mat-label>Repositorio</mat-label>
-        <input matInput formControlName="urlRepository">
-      </mat-form-field>
-      <mat-form-field appearance="fill" style="width: 100%;" visible="false">
-        <mat-label>PlantUML Diagram</mat-label>
-        <input matInput formControlName="plantUmlDiagram">
-      </mat-form-field> -->
-
-
-
       <div [formGroupName]="'properties'">
         <!-- Application -->
         <h3>Propiedades de Aplicación</h3>

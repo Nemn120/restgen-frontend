@@ -88,7 +88,6 @@ export class ProjectComponent implements OnInit {
 
     });
 
-    // Verifica si hay un id en la ruta para modo edición
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -174,17 +173,16 @@ export class ProjectComponent implements OnInit {
   generate() {
     this.projectService.generate(this.projectId).subscribe(
       () => {
+        this.loadProject(this.projectId);
         this.messageService.message('Proyecto generado correctamente', 'success');
       });
   }
 
   uploadGithub() {
-    // Implementa la lógica de subida a GitHub aquí
     alert('Funcionalidad de subir a GitHub no implementada aún');
   }
 
   entities() {
-    // Implementa la lógica para manejar entidades aquí
     if (this.projectId) {
       this.router.navigate(['project', this.projectId, 'entities']);
     }

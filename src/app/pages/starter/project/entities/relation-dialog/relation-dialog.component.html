@@ -1,0 +1,107 @@
+<h1 mat-dialog-title style="text-align: center;">Agregar {{ mode == 'column' ? 'columna' : 'entidad' }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="columnForm" *ngIf="mode === 'column'">
+    <div formGroupName="property" style="display: flex; gap: 8px;">
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="INTEGER">INTEGER</mat-option>
+          <mat-option value="DOUBLE">DOUBLE</mat-option>
+          <mat-option value="LONG">LONG</mat-option>
+          <mat-option value="STRING">STRING</mat-option>
+          <mat-option value="DATE">DATE</mat-option>
+          <mat-option value="LOCAL_DATE">LOCAL_DATE</mat-option>
+          <mat-option value="LOCAL_DATE_TIME">LOCAL_DATE_TIME</mat-option>
+          <mat-option value="BIG_DECIMAL">BIG_DECIMAL</mat-option>
+          <mat-option value="BOOLEAN">BOOLEAN</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Visibilidad</mat-label>
+        <mat-select formControlName="visibility">
+          <mat-option value="PUBLIC">PUBLIC</mat-option>
+          <mat-option value="PROTECTED">PROTECTED</mat-option>
+          <mat-option value="PRIVATE">PRIVATE</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div formGroupName="column" style="display: flex; gap: 8px;">
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Nombre columna</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+
+      <mat-form-field *ngIf="columnForm.get('property.type')?.value === 'STRING'" appearance="fill" style="flex:1;">
+        <mat-label>Longitud</mat-label>
+        <input matInput type="number" formControlName="length" min="1" max="255">
+      </mat-form-field>
+
+      <mat-form-field *ngIf="columnForm.get('property.type')?.value === 'BIG_DECIMAL'" appearance="fill"
+        style="flex:1;">
+        <mat-label>Precisión</mat-label>
+        <input matInput type="number" formControlName="precision">
+      </mat-form-field>
+      <mat-form-field *ngIf="columnForm.get('property.type')?.value === 'BIG_DECIMAL'" appearance="fill"
+        style="flex:1;">
+        <mat-label>Escala</mat-label>
+        <input matInput type="number" formControlName="scale">
+      </mat-form-field>
+
+
+      <mat-checkbox formControlName="unique">Único</mat-checkbox>
+      <mat-checkbox formControlName="nullable">Nulo</mat-checkbox>
+    </div>
+  </form>
+
+  <!-- Formulario para relación -->
+  <form [formGroup]="relationForm" *ngIf="mode === 'relation'">
+    <div formGroupName="property" style="display: flex; gap: 8px;">
+      <mat-form-field appearance="fill" style="flex:2;">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Visibilidad</mat-label>
+        <mat-select formControlName="visibility">
+          <mat-option value="PUBLIC">PUBLIC</mat-option>
+          <mat-option value="PROTECTED">PROTECTED</mat-option>
+          <mat-option value="PRIVATE">PRIVATE</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div formGroupName="relation" style="display: flex; gap: 8px;">
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Tipo relación</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="MANY_TO_ONE">ManyToOne</mat-option>
+          <mat-option value="ONE_TO_ONE">OneToOne</mat-option>
+          <mat-option value="ONE_TO_MANY">OneToMany</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Entidad destino</mat-label>
+        <mat-select formControlName="targetEntity">
+          <mat-option *ngFor="let name of data.entityNames" [value]="name">{{ name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="flex:1;">
+        <mat-label>Fetch</mat-label>
+        <mat-select formControlName="fetch">
+          <mat-option value="LAZY">LAZY</mat-option>
+          <mat-option value="EAGER">EAGER</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" (click)="save()"
+    [disabled]="mode === 'column' ? columnForm.invalid : relationForm.invalid">
+    Guardar
+  </button>
+</mat-dialog-actions>
