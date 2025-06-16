@@ -61,6 +61,7 @@ export interface ProyectForm {
 export interface ClassModel {
   name: string;
   entity: EntityModel;
+  apiName?: string;
 }
 
 export interface EntityModel {
@@ -127,4 +128,10 @@ export interface RelationDetails {
   fetch?: string | null;
   joinColumnReferenced?: string | null;
   notAudited?: boolean | null;
+}
+
+export interface FindAllEntities {
+  name: string;
+  tableName: String;
+  apiName?: string;
 }

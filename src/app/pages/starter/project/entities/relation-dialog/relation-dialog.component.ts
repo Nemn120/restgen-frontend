@@ -8,6 +8,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-relation-dialog',
@@ -21,7 +22,8 @@ import { MatCardModule } from '@angular/material/card';
     MatCheckboxModule,
     MatButtonModule,
     MatInputModule,
-    MatCardModule
+    MatCardModule,
+    MatTooltipModule
   ],
 })
 export class RelationDialogComponent implements OnInit {
@@ -62,21 +64,20 @@ export class RelationDialogComponent implements OnInit {
     this.relationForm = this.fb.group({
       property: this.fb.group({
         name: ['', Validators.required],
-        type: [''],
+        type: ['', Validators.required],
         visibility: ['PRIVATE']
       }),
       column: this.fb.group({
-        name: [''],
+        name: [null],
         length: [null],
         precision: [null],
         scale: [null],
-        unique: [false],
+        unique: [null],
         foreignkey: [true],
         nullable: [true]
       }),
       relation: this.fb.group({
-        type: ['', Validators.required],
-        targetEntity: ['', Validators.required],
+        type: ['MANY_TO_ONE', Validators.required],
         fetch: ['LAZY', Validators.required]
       })
     });

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { ClassModel } from '../models/proyect.model';
+import { ClassModel, FindAllEntities } from '../models/proyect.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class EntityService {
   constructor(private http: HttpClient) { }
 
   findByProjectId(projectId: string) {
-    return this.http.get<ClassModel[]>(`${EntityService.END_POINT}/project/${projectId}`);
+    return this.http.get<FindAllEntities[]>(`${EntityService.END_POINT}/project/${projectId}`);
   }
 
   findById(projectId: string, entityId: string) {
@@ -25,6 +25,6 @@ export class EntityService {
   }
 
   delete(projectId: string, entityId: string) {
-    return this.http.delete<any>(`${EntityService.END_POINT}/${projectId}/${entityId}`);
+    return this.http.delete<any>(`${EntityService.END_POINT}/project/${projectId}/class/${entityId}`);
   }
 }

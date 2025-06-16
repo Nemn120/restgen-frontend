@@ -1,13 +1,17 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import * as pako from "pako"
 import {encode64} from './base64-encoder';
-import {mouseWheelZoom, MouseWheelZoomConfig} from 'mouse-wheel-zoom';
+import {mouseWheelZoom} from 'mouse-wheel-zoom';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-diagram-view',
   templateUrl: './diagram-view.component.html',
-  styleUrls: ['./diagram-view.component.scss']
+  styleUrls: ['./diagram-view.component.scss'],
+  imports: [
+    CommonModule
+  ],
 })
 export class DiagramViewComponent implements OnChanges {
   @Input() plantUML: string;

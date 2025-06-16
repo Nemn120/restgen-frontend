@@ -10,9 +10,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DialogoConfirmacionComponent } from 'src/app/_shared/dialogo-confirmacion/dialogo-confirmacion.component';
-import { ClassModel } from 'src/app/models/proyect.model';
+import { ClassModel, FindAllEntities } from 'src/app/models/proyect.model';
 import { MessageService } from 'src/app/services/message.service';
-import { RelationDialogComponent } from './relation-dialog/relation-dialog.component';
+import { ProjectService } from 'src/app/services/project.service';
+import { DiagramViewComponent } from '../../diagram-view/diagram-view.component';
+import { EntityDiagramDialogComponent } from './entity-diagram-dialog/entity-diagram-dialog.component';
 
 @Component({
   selector: 'app-entities',
@@ -32,12 +34,14 @@ import { RelationDialogComponent } from './relation-dialog/relation-dialog.compo
 export class EntitiesComponent implements OnInit {
 
   projectId: string | null = null;
-  entities: ClassModel[] = [];
+  entities: FindAllEntities[] = [];
 
   constructor(private route: ActivatedRoute, private router: Router,
     private entityService: EntityService,
     private messageService: MessageService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private projectService: ProjectService,
+
 
   ) { }
 
@@ -50,7 +54,7 @@ export class EntitiesComponent implements OnInit {
 
   private findEntities() {
     this.entityService.findByProjectId(this.projectId)
-      .subscribe((data: ClassModel[]) => {
+      .subscribe((data: FindAllEntities[]) => {
         this.entities = data;
       });
   }
@@ -79,7 +83,7 @@ export class EntitiesComponent implements OnInit {
       .afterClosed()
       .subscribe(confirmado => {
         if (confirmado) {
-          this.entityService.delete(entity.name, this.projectId).subscribe({
+          this.entityService.delete(this.projectId, entity.name).subscribe({
             next: () => {
               this.entities = this.entities.filter(e => e.name !== entity.name);
               this.messageService.message('Entidad eliminado correctamente', 'success');
@@ -94,50 +98,24 @@ export class EntitiesComponent implements OnInit {
       );
   }
 
-
-  openRelationDialog(entity: ClassModel) {
-    const entityNames = this.entities.map(e => e.name);
-
-    const dialogRef = this.dialog.open(RelationDialogComponent, {
-      width: '500px',
-      data: { entityNames }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (result.type === 'HERENCIA') {
-          entity.entity.options = entity.entity.options || {};
-          entity.entity.options.inheritanceStrategy = result.inheritanceStrategy;
-          entity.entity.options.discriminator = result.discriminator;
-        } else if (
-          result.type === 'MANY_TO_ONE' ||
-          result.type === 'ONE_TO_ONE' ||
-          result.type === 'ONE_TO_MANY'
-        ) {
-          entity.entity.columns = entity.entity.columns || [];
-          entity.entity.columns.push({
-            property: {
-              name: result.propertyName || '',
-              type: result.propertyType || '',
-              visibility: 'PRIVATE'
-            },
-            column: {
-              name: '',
-              length: null,
-              precision: null,
-              scale: null,
-              unique: null,
-              foreignkey: null,
-              nullable: null
-            },
-            relation: {
-              type: result.relation.type,
-              fetch: result.relation.fetch,
-              joinColumnReferenced: result.relation.joinColumnReferenced
-            }
+  viewDiagram() {
+    if (this.projectId) {
+      this.projectService.getDiagram(this.projectId).subscribe({
+        next: (data) => {
+          this.dialog.open(EntityDiagramDialogComponent, {
+            data: data.plantUmlDiagram,
+            width: '900px',
+            maxWidth: '1100px',
+            height: '500px'
           });
+        },
+        error: () => {
+          this.messageService.message('Error visualizar diagrama', 'error');
         }
-      }
-    });
+      });
+    } else {
+      this.messageService.message('No se ha seleccionado un proyecto', 'error');
+    }
   }
+
 }

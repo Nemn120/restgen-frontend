@@ -4,6 +4,7 @@
     <span style="display: flex; gap: 8px;">
 
       <button mat-raised-button class="bg-light-primary" (click)="goToCreateEntity()">Nueva Entidad</button>
+      <button mat-raised-button class="bg-light-success" (click)="viewDiagram()">Ver diagrama</button>
       <button mat-raised-button class="bg-light-error" (click)="goBack()">Regresar</button>
     </span>
   </mat-card-title>
@@ -15,7 +16,11 @@
       </ng-container>
       <ng-container matColumnDef="tableName">
         <th mat-header-cell *matHeaderCellDef>Tabla</th>
-        <td mat-cell *matCellDef="let entity">{{ entity.entity.tableName }}</td>
+        <td mat-cell *matCellDef="let entity">{{ entity.tableName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="apiName">
+        <th mat-header-cell *matHeaderCellDef>Nombre de la api</th>
+        <td mat-cell *matCellDef="let entity">{{ entity.apiName }}</td>
       </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Acciones</th>
@@ -30,8 +35,8 @@
           </button>
         </td>
       </ng-container>
-      <tr mat-header-row *matHeaderRowDef="['name', 'tableName', 'actions']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['name', 'tableName', 'actions'];"></tr>
+      <tr mat-header-row *matHeaderRowDef="['name', 'tableName','apiName', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['name', 'tableName', 'apiName','actions'];"></tr>
     </table>
   </mat-card-content>
 

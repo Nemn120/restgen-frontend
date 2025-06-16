@@ -1,5 +1,7 @@
 <div class="d-flex align-items-center justify-content-between">
-  <div class="branding"><app-branding></app-branding></div>
+  <div class="branding d-flex justify-content-center" style="flex:1;">
+    <app-branding></app-branding>
+  </div>
 
   @if(showToggle) {
   <a href="javascript:void(0)" (click)="toggleMobileNav.emit()"

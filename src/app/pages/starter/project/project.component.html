@@ -1,24 +1,23 @@
 <mat-card>
   <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
-  <span style="padding-left: 20px">{{ title }}</span>
-  <span style="display: flex; gap: 8px;">
-    <button mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
-    @if (projectId) {
+    <span style="padding-left: 20px">{{ title }}</span>
+    <span style="display: flex; gap: 8px;">
+      <button mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
+      @if (projectId) {
       @if(this.existsClass) {
-        <button mat-raised-button class="bg-light-secondary" (click)="generate()">Generar</button>
-        @if(this.status === 'GENERATED') {
-        <button mat-raised-button (click)="download()">Descargar</button>
-        <button mat-raised-button class="bg-light-warning" (click)="uploadGithub()">Subir a GitHub</button>
-        }
+      <button mat-raised-button class="bg-light-secondary" (click)="generate()">Generar</button>
+      @if(this.status === 'GENERATED') {
+      <button mat-raised-button (click)="download()">Descargar</button>
+      <button mat-raised-button class="bg-light-warning" (click)="uploadGithub()">Subir a GitHub</button>
+      }
       }
       <button mat-raised-button (click)="entities()">Entidades</button>
-    }
-    <button mat-raised-button class="bg-light-error" (click)="cancelar()">Regresar</button>
-  </span>
-</mat-card-title>
+      }
+      <button mat-raised-button class="bg-light-error" (click)="cancelar()">Regresar</button>
+    </span>
+  </mat-card-title>
   <mat-card-content>
     <form [formGroup]="projectForm">
-      <!-- Datos principales -->
       <div style="display: flex; gap: 16px;">
         <mat-form-field appearance="fill" style="flex: 1;">
           <mat-label>Nombre</mat-label>
@@ -40,46 +39,44 @@
       </mat-form-field>
 
       <div [formGroupName]="'properties'">
-        <!-- Application -->
         <h3>Propiedades de Aplicación</h3>
         <div [formGroupName]="'application'" style="display: flex; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Ruta base</mat-label>
-            <input matInput formControlName="basePath">
+            <input matInput formControlName="basePath" matTooltip="Ruta base para los endpoints de la API">
           </mat-form-field>
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Puerto</mat-label>
-            <input matInput type="number" formControlName="port">
+            <input matInput type="number" formControlName="port" matTooltip="Puerto donde se ejecutará la aplicación">
           </mat-form-field>
         </div>
 
-        <!-- Maven -->
         <h3>Maven</h3>
         <div [formGroupName]="'maven'" style="display: flex; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>GroupId</mat-label>
-            <input matInput formControlName="groupId">
+            <input matInput formControlName="groupId"
+              matTooltip="Identificador único del grupo Maven (ej: com.ejemplo)">
           </mat-form-field>
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>ArtifactId</mat-label>
-            <input matInput formControlName="artifactId">
+            <input matInput formControlName="artifactId"
+              matTooltip="Identificador único del artefacto Maven (ej: mi-proyecto)">
           </mat-form-field>
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Versión</mat-label>
-            <input matInput formControlName="version">
+            <input matInput formControlName="version" matTooltip="Versión del artefacto Maven (ej: 1.0.0)">
           </mat-form-field>
         </div>
 
-        <!-- Seguridad -->
         <h3>Seguridad</h3>
         <div [formGroupName]="'security'" style="display: flex; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Secret Key</mat-label>
-            <input matInput formControlName="secretKey">
+            <input matInput formControlName="secretKey" matTooltip="Clave secreta para la seguridad de la aplicación">
           </mat-form-field>
         </div>
 
-        <!-- Documentation -->
         <h3>Documentación</h3>
         <div [formGroupName]="'documentation'">
           <div style="display: flex; gap: 16px;">
@@ -96,7 +93,6 @@
             <mat-label>Descripción</mat-label>
             <textarea matInput formControlName="description"></textarea>
           </mat-form-field>
-          <!-- Agrupa los campos de contacto en una línea -->
           <div style="display: flex; gap: 16px;">
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Nombre de Contacto</mat-label>
@@ -112,7 +108,6 @@
             </mat-form-field>
           </div>
 
-          <!-- Agrupa los campos de licencia en otra línea -->
           <div style="display: flex; gap: 16px;">
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Nombre de Licencia</mat-label>

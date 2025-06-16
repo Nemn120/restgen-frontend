@@ -12,6 +12,7 @@ import { UserRegister } from 'src/app/models/user.register.model';
   selector: 'app-side-register',
   imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule],
   templateUrl: './side-register.component.html',
+  styleUrl: './side-register.component.scss'
 })
 export class AppSideRegisterComponent {
   options = this.settings.getOptions();

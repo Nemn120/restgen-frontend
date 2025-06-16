@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -16,6 +16,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EntityService } from 'src/app/services/entity.service';
 import { RelationDialogComponent } from '../relation-dialog/relation-dialog.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MessageService } from 'src/app/services/message.service';
+import { DialogoConfirmacionComponent } from 'src/app/_shared/dialogo-confirmacion/dialogo-confirmacion.component';
+import { FindAllEntities } from 'src/app/models/proyect.model';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-entity-form',
@@ -32,7 +36,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatCheckboxModule,
     MatSelectModule,
     MatTooltipModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatChipsModule
   ],
   templateUrl: './entity-form.component.html',
   styleUrl: './entity-form.component.scss'
@@ -43,9 +48,12 @@ export class EntityFormComponent implements OnInit {
   projectId: string | null = null;
   entityName: string | null = null;
   editMode = false;
-  entities: any[] = []; // Aquí puedes definir el tipo adecuado según tu modelo
-  isSuperClass = false; // Para indicar si es una super clase
-  disableDiscriminatorValue = false;
+  entities: any[] = [];
+  isSuperClass = false;
+
+  originalName: string | null = null;
+  originalTableName: string | null = null;
+  originalApiName: string | null = null;
 
   columnDisplayedColumns = ['name', 'type', 'actions'];
   relationDisplayedColumns = ['name', 'type', 'target', 'actions'];
@@ -55,33 +63,31 @@ export class EntityFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private entityService: EntityService,
-    private dialog: MatDialog // <--- agrega esto
+    private dialog: MatDialog,
+    private messageService: MessageService
 
   ) {
     this.entityForm = this.fb.group({
       name: ['', Validators.required],
+      apiName: [null, [Validators.required]],
       entity: this.fb.group({
-        tableName: ['', Validators.required],
-        extendsClass: [''],
+        tableName: [null],
+        extendsClass: [null],
         options: this.fb.group({
-          inheritanceStrategy: [''],
-          uniqueConstraints: this.fb.array([]),
+          inheritanceStrategy: [null],
+          uniqueConstraints: this.fb.control([]),
           discriminator: this.fb.group({
             column: this.fb.group({
-              name: [''],
+              name: [null],
               length: [null]
 
             }),
-            options: this.fb.group({
-              force: [false],
-              insert: [false]
-            }),
-            value: ['']
+            value: new FormControl({ value: null, disabled: true }),
           }),
           sequence: this.fb.group({
             create: [false],
-            name: [''],
-            increment: [null]
+            name: new FormControl({ value: null, disabled: true }),
+            increment: new FormControl({ value: null, disabled: true })
           })
         }),
         columns: this.fb.array([])
@@ -95,60 +101,140 @@ export class EntityFormComponent implements OnInit {
       this.entityName = params.get('entityName');
       if (this.entityName) {
         this.editMode = true;
-        // Aquí deberías cargar la entidad desde el servicio y hacer patchValue
-        // this.entityService.getEntity(this.projectId, this.entityName).subscribe(entity => {
-        //   this.setEntityForm(entity);
-        // });
-        this.entityService.findById(this.projectId, this.entityName).subscribe(entity => {
-          this.setEntityForm(entity);
-        });
+        this.findEntityByName();
       }
       this.findEntities();
 
       this.entityForm.get('entity.extendsClass')?.valueChanges.subscribe(val => {
-        this.disableDiscriminatorValue = !val; // true si null, undefined o ''
-        if (this.disableDiscriminatorValue) {
-          this.entityForm.get('entity.options.discriminator.value')?.setValue('');
+        this.entityForm.get('entity.options.discriminator.value')?.setValue(null);
+        if (val) {
+          this.entityForm.get('entity.options.discriminator.value')?.enable();
+        } else {
+          this.entityForm.get('entity.options.discriminator.value')?.disable();
         }
       });
 
+      this.entityForm.get('entity.options.sequence.create')?.valueChanges.subscribe(val => {
+        this.entityForm.get('entity.options.sequence.name')?.setValue(null);
+        this.entityForm.get('entity.options.sequence.name')?.setValue(null);
+        if (val) {
+          this.entityForm.get('entity.options.sequence.name')?.enable();
+          this.entityForm.get('entity.options.sequence.increment')?.enable();
+        } else {
+          this.entityForm.get('entity.options.sequence.name')?.disable();
+          this.entityForm.get('entity.options.sequence.increment')?.disable();
+        }
+      });
+
+      this.entityForm.get('name')!.valueChanges.subscribe((value: string) => {
+        const snake = this.convertCamelToGionCaseLower(value);
+        this.entityForm.get('apiName')!.setValue(snake, { emitEvent: false });
+      });
+
+      this.entityForm.get('name')!.valueChanges.subscribe((value: string) => {
+        const snake = this.convertCamelToSnakeCaseUpper(value);
+        this.entityForm.get('entity.tableName')!.setValue(snake, { emitEvent: false });
+      });
     });
+  }
+
+  findEntityByName() {
+    if (!this.projectId || !this.entityName) return;
+
+    this.entityService.findById(this.projectId, this.entityName)
+      .subscribe({
+        next: (classModel) => {
+          this.setEntityForm(classModel);
+          this.isSuperClass = !!classModel.entity.extendsClass;
+        },
+        error: (err) => {
+          console.error('Error al cargar la entidad:', err);
+        }
+      });
+  }
+
+  uniqueEntityNameValidator(existingNames: (string | null | undefined)[], originalName?: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value?.trim().toLowerCase();
+      if (!value) return null;
+
+      // Filtra nulos y excluye el nombre original
+      const filteredNames = (originalName
+        ? existingNames.filter(n => n && n.toLowerCase() !== originalName.trim().toLowerCase())
+        : existingNames.filter(n => n)
+      ) as string[];
+
+      return filteredNames.map(n => n.toLowerCase()).includes(value)
+        ? { notUnique: true }
+        : null;
+    };
+  }
+
+  convertCamelToSnakeCaseUpper(input: string): string {
+    if (!input) return input;
+    let result = input[0].toUpperCase();
+    for (let i = 1; i < input.length; i++) {
+      const currentChar = input[i];
+      if (currentChar === currentChar.toUpperCase() && /[A-Z]/.test(currentChar)) {
+        result += '_' + currentChar.toUpperCase();
+      } else {
+        result += currentChar.toUpperCase();
+      }
+    }
+    return result;
+  }
+
+  convertCamelToGionCaseLower(input: string): string {
+    if (!input) return input;
+    let result = input[0].toLowerCase();
+    for (let i = 1; i < input.length; i++) {
+      const currentChar = input[i];
+      if (/[A-Z]/.test(currentChar)) {
+        result += '-' + currentChar.toLowerCase();
+      } else {
+        result += currentChar;
+      }
+    }
+    return result;
   }
 
   findEntities() {
     this.entityService.findByProjectId(this.projectId)
-      .subscribe((data: any[]) => {
+      .subscribe((data: FindAllEntities[]) => {
         this.entities = data;
+
+        const existingNames = this.entities.map(e => e.name);
+
+        this.entityForm.get('name')?.setValidators([
+          Validators.required,
+          this.uniqueEntityNameValidator(existingNames, this.originalName)
+        ]);
+
+        this.entityForm.get('entity.tableName')?.setValidators([
+          this.uniqueEntityNameValidator(this.entities.map(e => e.tableName), this.originalTableName)
+        ]);
+
+        this.entityForm.get('apiName')?.setValidators([
+          Validators.required,
+          this.uniqueEntityNameValidator(this.entities.map(e => e.apiName), this.originalApiName)
+        ]);
       });
   }
 
-
-  // Métodos para uniqueConstraints
-  get uniqueConstraints(): FormArray {
-    return this.entityForm.get('entity.options.uniqueConstraints') as FormArray;
-  }
-  addUniqueConstraint() {
-    this.uniqueConstraints.push(this.fb.control(''));
-  }
-  removeUniqueConstraint(index: number) {
-    this.uniqueConstraints.removeAt(index);
-  }
-
-  // Métodos para columns
   get columns(): FormArray {
     return this.entityForm.get('entity.columns') as FormArray;
   }
 
   addColumn() {
-    this.columns.push(this.fb.group({
+    const columnGroup = this.fb.group({
       property: this.fb.group({
         name: ['', Validators.required],
         type: ['', Validators.required],
         visibility: ['PRIVATE']
       }),
       column: this.fb.group({
-        name: [''],
-        length: [null],
+        name: [null],
+        length: [null, Validators.maxLength(255)],
         precision: [null],
         scale: [null],
         unique: [false],
@@ -159,16 +245,39 @@ export class EntityFormComponent implements OnInit {
         type: [''],
         fetch: [''],
       })
-    }));
+    });
+    columnGroup.get('property.name')!.valueChanges.subscribe((value: string) => {
+      columnGroup.get('column.name')!.setValue(this.convertCamelToSnakeCaseUpper(value), { emitEvent: false });
+    });
+    this.columns.push(columnGroup);
   }
   removeColumn(index: number) {
-    this.columns.removeAt(index);
+    const params = {
+      title: 'Eliminar columna',
+      description: '¿Está seguro de eliminar la columna?',
+      inputData: true
+    };
+    this.dialog.open(DialogoConfirmacionComponent, {
+      data: params, hasBackdrop: false
+    })
+      .afterClosed()
+      .subscribe(confirmado => {
+        if (confirmado) {
+          this.columns.removeAt(index);
+        }
+      }
+      );
   }
 
-  // Método para setear el formulario en modo edición
   setEntityForm(classModel: any) {
+    this.originalName = classModel.name;
+    this.originalTableName = classModel.entity.tableName;
+    this.originalApiName = classModel.apiName;
+
+
     this.entityForm.patchValue({
       name: classModel.name,
+      apiName: classModel.apiName,
       entity: {
         tableName: classModel.entity.tableName,
         extendsClass: classModel.entity.extendsClass,
@@ -176,7 +285,6 @@ export class EntityFormComponent implements OnInit {
           inheritanceStrategy: classModel.entity.options?.inheritanceStrategy,
           discriminator: classModel.entity.options?.discriminator || {
             column: { name: '', type: '', length: null },
-            options: { force: false, insert: false },
             value: classModel.entity.options?.discriminator?.value || ''
           },
           sequence: classModel.entity.options?.sequence || {
@@ -186,13 +294,10 @@ export class EntityFormComponent implements OnInit {
       }
     });
 
-    // Unique constraints
-    this.uniqueConstraints.clear();
-    (classModel.entity.options?.uniqueConstraints || []).forEach((uc: string) => {
-      this.uniqueConstraints.push(this.fb.control(uc));
-    });
+    if (classModel.entity.options?.uniqueConstraints) {
+      this.entityForm.get('entity.options.uniqueConstraints')?.setValue(classModel.entity.options.uniqueConstraints);
+    }
 
-    // Columns
     this.columns.clear();
     (classModel.entity.columns || []).forEach((col: any) => {
       this.columns.push(this.fb.group({
@@ -211,15 +316,14 @@ export class EntityFormComponent implements OnInit {
           nullable: [col.column.nullable]
         }),
         relation: this.fb.group({
-          type: [col.relation?.type || ''],
-          fetch: [col.relation?.fetch || ''],
-          joinColumnReferenced: [col.relation?.joinColumnReferenced || ''],
+          type: [col.relation?.type || null],
+          fetch: [col.relation?.fetch || null],
+          joinColumnReferenced: [col.relation?.joinColumnReferenced || null],
           notAudited: [col.relation?.notAudited || false]
         })
       }));
     });
 
-    // Discriminator y sequence (si existen)
     if (classModel.entity.options?.discriminator) {
       this.entityForm.get('entity.options.discriminator')?.patchValue(classModel.entity.options.discriminator);
     }
@@ -229,15 +333,14 @@ export class EntityFormComponent implements OnInit {
   }
 
   saveEntity() {
+    console.log('Guardando entidad:', this.entityForm.value);
+    console.log(this.entityForm.invalid, this.entityForm.errors);
     if (this.entityForm.invalid) {
       this.entityForm.markAllAsTouched();
       return;
     }
 
-    // Clona el valor del formulario para no modificar el original
     const formValue = JSON.parse(JSON.stringify(this.entityForm.value));
-
-    // Limpia el campo relation si no es relación
     formValue.entity.columns = formValue.entity.columns.map((col: any) => {
       if (!col.relation?.type) {
         delete col.relation;
@@ -247,7 +350,8 @@ export class EntityFormComponent implements OnInit {
 
     this.entityService.create(this.projectId, formValue).subscribe({
       next: () => {
-        this.router.navigate(['../'], { relativeTo: this.route });
+        this.findEntities();
+        this.messageService.message('Entidad guardada correctamente', 'success');
       },
       error: (err) => {
         console.error('Error al guardar la entidad:', err);
@@ -257,10 +361,6 @@ export class EntityFormComponent implements OnInit {
 
   cancel() {
     this.router.navigate(['../'], { relativeTo: this.route });
-  }
-
-  get isSequenceEnabled(): boolean {
-    return this.entityForm.get('entity.options.sequence.create')?.value;
   }
 
   get columnNames(): string[] {
@@ -277,7 +377,6 @@ export class EntityFormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Estructura compatible con tu FormArray
         this.columns.push(this.fb.group({
           property: this.fb.group({
             name: [result.property?.name || '', Validators.required],
@@ -285,7 +384,7 @@ export class EntityFormComponent implements OnInit {
             visibility: [result.property?.visibility || 'PRIVATE']
           }),
           column: this.fb.group({
-            name: [result.column?.name || ''],
+            name: [result.column?.name || null],
             length: [result.column?.length ?? null],
             precision: [result.column?.precision ?? null],
             scale: [result.column?.scale ?? null],
@@ -294,10 +393,9 @@ export class EntityFormComponent implements OnInit {
             nullable: [result.column?.nullable ?? true]
           }),
           relation: this.fb.group({
-            type: [result.relation?.type || ''],
-            fetch: [result.relation?.fetch || ''],
-            joinColumnReferenced: [result.relation?.joinColumnReferenced || ''],
-            notAudited: [result.relation?.notAudited || false]
+            type: [result.relation?.type || null],
+            fetch: [result.relation?.fetch || null],
+            joinColumnReferenced: [result.relation?.joinColumnReferenced || null]
           })
         }));
       }
@@ -305,27 +403,39 @@ export class EntityFormComponent implements OnInit {
   }
 
   get columnItems() {
-    // Solo columnas simples (sin tipo de relación o relación vacía)
     return this.columns.controls
       .map(ctrl => ctrl.value)
-      .filter(col => !col.relation?.type || col.relation?.type === '');
+      .filter(col => !col.relation?.type || col.relation?.type === null);
   }
 
   get relationItems() {
-    // Solo relaciones (tipo de relación definido)
     return this.columns.controls
       .map(ctrl => ctrl.value)
-      .filter(col => col.relation?.type && col.relation?.type !== '');
+      .filter(col => col.relation?.type && col.relation?.type !== null);
   }
 
   removeColumnByType(index: number, type: 'column' | 'relation') {
-    // Busca el índice real en el FormArray
-    let items = type === 'column' ? this.columnItems : this.relationItems;
-    let item = items[index];
-    let realIndex = this.columns.controls.findIndex(ctrl => ctrl.value === item);
-    if (realIndex !== -1) {
-      this.columns.removeAt(realIndex);
-    }
+    const title = type === 'column' ? 'columna' : 'relación';
+    const params = {
+      title: 'Eliminar ' + title,
+      description: '¿Está seguro de eliminar ' + title + '?',
+      inputData: true
+    };
+    this.dialog.open(DialogoConfirmacionComponent, {
+      data: params, hasBackdrop: false
+    })
+      .afterClosed()
+      .subscribe(confirmado => {
+        if (confirmado) {
+          let items = type === 'column' ? this.columnItems : this.relationItems;
+          let item = items[index];
+          let realIndex = this.columns.controls.findIndex(ctrl => ctrl.value === item);
+          if (realIndex !== -1) {
+            this.columns.removeAt(realIndex);
+          }
+        }
+      }
+      );
   }
 
 

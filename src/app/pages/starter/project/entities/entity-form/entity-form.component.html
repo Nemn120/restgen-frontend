@@ -8,24 +8,46 @@
   </mat-card-title>
   <mat-card-content>
     <form [formGroup]="entityForm">
-      <!-- Agrupación en una sola línea -->
       <div style="display: flex; gap: 16px;">
-        <mat-form-field appearance="fill" style="width: 20%;">
+        <mat-form-field appearance="fill" style="flex:1;">
           <mat-label>Nombre de la Entidad</mat-label>
           <input matInput formControlName="name">
+          <mat-error *ngIf="entityForm.get('name')?.hasError('notUnique')">
+            El nombre ya existe.
+          </mat-error>
         </mat-form-field>
+
+        <mat-form-field appearance="fill" style="flex:1;">
+          <mat-label>Nombre API</mat-label>
+          <input matInput formControlName="apiName" required>
+          <mat-error *ngIf="entityForm.get('apiName')?.hasError('required')">
+            El nombre API es requerido.
+          </mat-error>
+          <mat-error *ngIf="entityForm.get('apiName')?.hasError('notUnique')">
+            El nombre API ya existe.
+          </mat-error>
+        </mat-form-field>
+
         <div formGroupName="entity" style="display: flex; flex:2; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Nombre de la Tabla</mat-label>
             <input matInput formControlName="tableName">
+            <mat-error *ngIf="entityForm.get('entity.tableName')?.hasError('notUnique')">
+              El nombre de la tabla ya existe.
+            </mat-error>
           </mat-form-field>
+        </div>
+        <mat-checkbox (change)="isSuperClass = $event.checked">
+          ¿Super clase?
+        </mat-checkbox>
+      </div>
 
-          <mat-checkbox (change)="isSuperClass = $event.checked">
-            ¿Super clase?
-          </mat-checkbox>
-
-          <ng-container *ngIf="!isSuperClass">
-            <mat-form-field appearance="fill" style="flex:1;" matTooltip="Selecciona la entidad padre para la herencia">
+      <ng-container *ngIf="!isSuperClass">
+        <div formGroupName="entity" style="display: flex; gap: 16px;">
+          <div style="flex:1;">
+            <h5>Super clase</h5>
+            <mat-form-field appearance="fill" style="width: 100%;"
+              matTooltip="Selecciona la entidad padre para la herencia">
               <mat-label>Entidad padre</mat-label>
               <mat-select formControlName="extendsClass">
                 <mat-option value="">Ninguna</mat-option>
@@ -34,23 +56,24 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
+          </div>
+          <div style="flex:1;">
+            <h5>Discriminador</h5>
             <div formGroupName="options">
               <div formGroupName="discriminator">
-                <mat-form-field appearance="fill" style="flex:1;"
+                <mat-form-field appearance="fill" style="width: 100%;"
                   matTooltip="Valor del discriminador para esta entidad hija (@DiscriminatorValue)">
-                  <mat-label>Discriminator Value</mat-label>
-                  <input matInput formControlName="value" placeholder="Ej: EMPLEADO"
-                    [disabled]="disableDiscriminatorValue">
+                  <mat-label>Valor</mat-label>
+                  <input matInput formControlName="value" placeholder="Ej: EMPLEADO">
                 </mat-form-field>
               </div>
             </div>
-          </ng-container>
+          </div>
         </div>
-      </div>
+      </ng-container>
 
       <div formGroupName="entity">
         <div formGroupName="options">
-          <!-- Campos de herencia solo si es superclase -->
           <ng-container *ngIf="isSuperClass">
             <div style="display: flex; gap: 16px; align-items: flex-end;">
               <div style="flex: 1;">
@@ -59,7 +82,7 @@
                   matTooltip="Define la estrategia de herencia JPA para entidades">
                   <mat-label>Estrategia de Herencia</mat-label>
                   <mat-select formControlName="inheritanceStrategy">
-                    <mat-option value="">Ninguna</mat-option>
+                    <mat-option [value]="null">Ninguna</mat-option>
                     <mat-option value="SINGLE_TABLE">SINGLE_TABLE</mat-option>
                     <mat-option value="JOINED">JOINED</mat-option>
                     <mat-option value="TABLE_PER_CLASS">TABLE_PER_CLASS</mat-option>
@@ -73,7 +96,7 @@
                     <mat-form-field appearance="fill" style="width: 100%;"
                       matTooltip="Nombre de la columna discriminadora para herencia JPA">
                       <mat-label>Nombre columna</mat-label>
-                      <input matInput formControlName="name">
+                      <input matInput formControlName="name" placeholder="Ej: tipo_empleado">
                     </mat-form-field>
                   </div>
                 </div>
@@ -81,7 +104,6 @@
             </div>
           </ng-container>
 
-          <!-- Unique Constraints -->
           <label matTooltip="Selecciona uno o más campos de la entidad para definir una restricción única en la tabla">
             Restricciones Únicas
           </label>
@@ -94,22 +116,22 @@
             </mat-select>
           </mat-form-field>
 
-          <h5>Secuencia</h5>
+          <h5>Secuencia personalizada</h5>
           <div formGroupName="sequence" style="display: flex; gap: 16px; align-items: center;">
             <mat-checkbox formControlName="create"
               matTooltip="Si está activo, se creará una secuencia para la generación de IDs">
-              Create
+              Crear
             </mat-checkbox>
             <mat-form-field appearance="fill" style="flex:1;"
               matTooltip="Nombre de la secuencia para la generación de IDs">
               <mat-label>Nombre</mat-label>
-              <input matInput formControlName="name" [disabled]="!isSequenceEnabled">
+              <input matInput formControlName="name" placeholder="Ej: seq_entity_id">
 
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;"
               matTooltip="Incremento de la secuencia (valor de incremento para cada nuevo ID)">
               <mat-label>Incremento</mat-label>
-              <input matInput type="number" formControlName="increment" [disabled]="!isSequenceEnabled">
+              <input matInput type="number" formControlName="increment" placeholder="Ej: 1">
 
             </mat-form-field>
           </div>
@@ -120,52 +142,68 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
-                Columnas
+                Propiedades
               </mat-panel-title>
             </mat-expansion-panel-header>
             <button mat-button color="primary" (click)="openRelationDialog('column')" type="button">
-              Agregar columna
+              Agregar propiedad
             </button>
             <table mat-table [dataSource]="columnItems" class="mat-elevation-z1" style="width: 100%;">
-              <!-- Nombre -->
+
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Nombre</th>
                 <td mat-cell *matCellDef="let col">{{ col.property.name }}</td>
               </ng-container>
-              <!-- Nombre Tabla -->
+
               <ng-container matColumnDef="tableName">
-                <th mat-header-cell *matHeaderCellDef>Nombre Tabla</th>
+                <th mat-header-cell *matHeaderCellDef>Nombre de columna</th>
                 <td mat-cell *matCellDef="let col">{{ col.column.name }}</td>
               </ng-container>
-              <!-- Tipo -->
+
               <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef>Tipo</th>
-                <td mat-cell *matCellDef="let col">{{ col.property.type }}</td>
+                <td mat-cell *matCellDef="let col">
+                  <mat-chip-set>
+                    <mat-chip [ngClass]="{
+          'bg-light-primary': col.property.type === 'STRING',
+          'bg-light-secondary': col.property.type === 'INTEGER' || col.property.type === 'LONG' || col.property.type === 'DOUBLE' || col.property.type === 'BIG_DECIMAL',
+          'bg-light-warning': col.property.type === 'DATE' || col.property.type === 'LOCAL_DATE' || col.property.type === 'LOCAL_DATE_TIME',
+          'bg-light-success': col.property.type === 'BOOLEAN'
+        }">
+                      {{ col.property.type }}
+                    </mat-chip>
+                  </mat-chip-set>
+                </td>
               </ng-container>
-              <!-- Visibilidad -->
+
               <ng-container matColumnDef="visibility">
                 <th mat-header-cell *matHeaderCellDef>Visibilidad</th>
                 <td mat-cell *matCellDef="let col">{{ col.property.visibility }}</td>
               </ng-container>
-              <!-- Adicional -->
+
               <ng-container matColumnDef="adicional">
                 <th mat-header-cell *matHeaderCellDef>Adicional</th>
                 <td mat-cell *matCellDef="let col">
                   <ng-container [ngSwitch]="col.property.type">
-                    <!-- STRING: Longitud -->
                     <span *ngSwitchCase="'STRING'">
+                      @if (col.column.length) {
                       Longitud: {{ col.column.length || '-' }}
+                      }
+
                     </span>
-                    <!-- BIG_DECIMAL: Precisión y Escala -->
                     <span *ngSwitchCase="'BIG_DECIMAL'">
-                      Precisión: {{ col.column.precision || '-' }}, Escala: {{ col.column.scale || '-' }}
+                      @if (col.column.precision) {
+                      Precisión: {{ col.column.precision || '-' }}
+                      }
+                      @if (col.column.scale) {
+                      Escala: {{ col.column.scale || '-' }}
+                      }
+
                     </span>
-                    <!-- Otros tipos: vacío -->
-                    <span *ngSwitchDefault>-</span>
                   </ng-container>
                 </td>
               </ng-container>
-              <!-- Acciones -->
+
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Acciones</th>
                 <td mat-cell *matCellDef="let col; let i = index">
@@ -175,13 +213,13 @@
                 </td>
               </ng-container>
               <tr mat-header-row *matHeaderRowDef="['name','tableName','type','visibility','adicional','actions']"></tr>
-              <tr mat-row *matRowDef="let row; columns: ['name','tableName','type','visibility','adicional','actions'];">
+              <tr mat-row
+                *matRowDef="let row; columns: ['name','tableName','type','visibility','adicional','actions'];">
               </tr>
             </table>
 
           </mat-expansion-panel>
 
-          <!-- Acordeón de relaciones -->
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -192,16 +230,31 @@
               relación</button>
             <table mat-table [dataSource]="relationItems" class="mat-elevation-z1" style="width: 100%;">
               <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <th mat-header-cell *matHeaderCellDef>Nombre campo</th>
                 <td mat-cell *matCellDef="let rel">{{ rel.property.name }}</td>
               </ng-container>
               <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef>Tipo Relación</th>
-                <td mat-cell *matCellDef="let rel">{{ rel.relation.type }}</td>
+                <td mat-cell *matCellDef="let rel">
+                  <mat-chip-set>
+                    <mat-chip [ngClass]="{
+                    'bg-light-primary': rel.relation.type === 'MANY_TO_ONE',
+                    'bg-light-secondary': rel.relation.type === 'ONE_TO_ONE',
+                    'bg-light-error': rel.relation.type !== 'MANY_TO_ONE' && rel.relation.type !== 'ONE_TO_ONE'
+                  }">
+                      {{ rel.relation.type }}
+                    </mat-chip>
+                  </mat-chip-set>
+                </td>
               </ng-container>
               <ng-container matColumnDef="target">
                 <th mat-header-cell *matHeaderCellDef>Entidad destino</th>
-                <td mat-cell *matCellDef="let rel">{{ rel.relation.targetEntity }}</td>
+                <td mat-cell *matCellDef="let rel">{{ rel.property.type }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="visibility">
+                <th mat-header-cell *matHeaderCellDef>Visibilidad</th>
+                <td mat-cell *matCellDef="let rel">{{ rel.property.visibility }}</td>
               </ng-container>
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Acciones</th>

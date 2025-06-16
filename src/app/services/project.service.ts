@@ -48,5 +48,8 @@ export class ProjectService {
     return this.http.patch(`${ProjectService.END_POINT}/generate`, body, { responseType: 'text' });
   }
 
+  getDiagram(uuid: string): Observable<any> {
+    return this.http.get(`${ProjectService.END_POINT}/${uuid}/diagram`);
+  }
 
 }

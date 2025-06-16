@@ -4,7 +4,7 @@
 @mixin syntax-colors($args...) {
   @each $name, $color in meta.keywords($args) {
     html .bg-#{$name} {
-      background-color: $color !important;
+    background-color: $color !important;
     }
 
     html .text-#{$name} {
@@ -38,3 +38,6 @@
   fill: $light;
   color: $light;
 }
+
+
+

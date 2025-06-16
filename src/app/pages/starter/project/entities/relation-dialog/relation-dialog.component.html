@@ -57,44 +57,63 @@
     </div>
   </form>
 
-  <!-- Formulario para relación -->
   <form [formGroup]="relationForm" *ngIf="mode === 'relation'">
-    <div formGroupName="property" style="display: flex; gap: 8px;">
-      <mat-form-field appearance="fill" style="flex:2;">
-        <mat-label>Nombre</mat-label>
-        <input matInput formControlName="name">
-      </mat-form-field>
-      <mat-form-field appearance="fill" style="flex:1;">
-        <mat-label>Visibilidad</mat-label>
-        <mat-select formControlName="visibility">
-          <mat-option value="PUBLIC">PUBLIC</mat-option>
-          <mat-option value="PROTECTED">PROTECTED</mat-option>
-          <mat-option value="PRIVATE">PRIVATE</mat-option>
-        </mat-select>
-      </mat-form-field>
+    <div style="display: flex; gap: 4px;">
+      <div formGroupName="property" style="flex:1;">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Entidad destino</mat-label>
+          <mat-select formControlName="type" matTooltip="Entidad a la que apunta la relación">
+            <mat-option *ngFor="let name of data.entityNames" [value]="name">{{ name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div formGroupName="relation" style="display: flex; gap: 4px; flex:1;">
+        <mat-form-field appearance="fill" style="flex:0.7; min-width: 70px; max-width: 165px;">
+          <mat-label>Tipo relación</mat-label>
+          <mat-select formControlName="type" matTooltip="Tipo de relación entre entidades">
+            <mat-option value="MANY_TO_ONE">ManyToOne</mat-option>
+            <mat-option value="ONE_TO_ONE">OneToOne</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="flex:0.5; min-width: 60px; max-width: 120px;">
+          <mat-label>Fetch</mat-label>
+          <mat-select formControlName="fetch" matTooltip="Estrategia de carga de la relación">
+            <mat-option value="LAZY">LAZY</mat-option>
+            <mat-option value="EAGER">EAGER</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
-    <div formGroupName="relation" style="display: flex; gap: 8px;">
-      <mat-form-field appearance="fill" style="flex:1;">
-        <mat-label>Tipo relación</mat-label>
-        <mat-select formControlName="type">
-          <mat-option value="MANY_TO_ONE">ManyToOne</mat-option>
-          <mat-option value="ONE_TO_ONE">OneToOne</mat-option>
-          <mat-option value="ONE_TO_MANY">OneToMany</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="fill" style="flex:1;">
-        <mat-label>Entidad destino</mat-label>
-        <mat-select formControlName="targetEntity">
-          <mat-option *ngFor="let name of data.entityNames" [value]="name">{{ name }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="fill" style="flex:1;">
-        <mat-label>Fetch</mat-label>
-        <mat-select formControlName="fetch">
-          <mat-option value="LAZY">LAZY</mat-option>
-          <mat-option value="EAGER">EAGER</mat-option>
-        </mat-select>
-      </mat-form-field>
+    <div style="display: flex; gap: 8px; margin-top: 8px;">
+      <div formGroupName="property" style="flex:1;">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Nombre campo</mat-label>
+          <input matInput formControlName="name" matTooltip="Nombre del atributo en la entidad origen">
+        </mat-form-field>
+      </div>
+      <div formGroupName="column" style="flex:1;">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Nombre columna</mat-label>
+          <input matInput formControlName="name" matTooltip="Nombre de la columna en la base de datos">
+        </mat-form-field>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px; margin-top: 8px;">
+      <div formGroupName="property" style="flex:1;">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Visibilidad</mat-label>
+          <mat-select formControlName="visibility" matTooltip="Nivel de acceso del campo en la clase">
+            <mat-option value="PUBLIC">PUBLIC</mat-option>
+            <mat-option value="PROTECTED">PROTECTED</mat-option>
+            <mat-option value="PRIVATE">PRIVATE</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div formGroupName="column" style="flex:1; display: flex; align-items: center;">
+        <mat-checkbox formControlName="nullable" matTooltip="Permite valores nulos en la columna">
+          Nullable
+        </mat-checkbox>
+      </div>
     </div>
   </form>
 </div>
