@@ -10,6 +10,14 @@ export class RoleGuardService implements CanActivate {
     }
 
     canActivate(route: ActivatedRouteSnapshot): boolean {
+        // Permitir acceso si la ruta es /browser/project y viene con code en query params
+        const url = route.url[0];
+        const hasCode = route.queryParams && route.queryParams['code'];
+        console.log(url)
+        console.log(route.queryParams['code'])
+        if (url.path === 'project' && hasCode) {
+            return true;
+        }
         const roles: Role[] = route.data['roles'];
         if (this.auth.hasRoles(roles)) {
             return true;

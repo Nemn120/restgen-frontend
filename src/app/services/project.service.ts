@@ -1,8 +1,9 @@
+import { AuthService } from 'src/app/services/auth.service';
 import { saveAs } from 'file-saver';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { Proyect, ProyectForm } from '../models/proyect.model';
+import { GitHubUploadDto, Proyect, ProyectForm } from '../models/proyect.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -12,7 +13,10 @@ export class ProjectService {
 
   static readonly END_POINT = environment.URI + '/api/projects';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   findAll(): Observable<Proyect[]> {
     return this.http.get<Proyect[]>(ProjectService.END_POINT);
@@ -50,6 +54,11 @@ export class ProjectService {
 
   getDiagram(uuid: string): Observable<any> {
     return this.http.get(`${ProjectService.END_POINT}/${uuid}/diagram`);
+  }
+
+  uploadProjectToGitHub(projectId: string, dto: GitHubUploadDto): Observable<any> {
+    dto.githubToken = this.authService.getTokenGithub();
+    return this.http.post(`${ProjectService.END_POINT}/upload/${projectId}`, dto);
   }
 
 }

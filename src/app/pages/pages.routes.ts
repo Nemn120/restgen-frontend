@@ -11,8 +11,7 @@ export const PagesRoutes: Routes = [
     data: {
       title: 'Starter',
       urls: [
-        { title: 'Proyectos', url: '/project' },
-        { title: 'Starter' },
+        { title: 'Proyectos', url: '/project' }
       ],
     },
   },

@@ -8,7 +8,11 @@
       <button mat-raised-button class="bg-light-secondary" (click)="generate()">Generar</button>
       @if(this.status === 'GENERATED') {
       <button mat-raised-button (click)="download()">Descargar</button>
-      <button mat-raised-button class="bg-light-warning" (click)="uploadGithub()">Subir a GitHub</button>
+      <button mat-raised-button class="bg-light-warning" (click)="uploadGithub()">
+        <img src="assets/images/icons8-github.svg" alt="GitHub" width="20" height="20"
+          style="vertical-align: middle; margin-right: 8px;">
+        Subir a GitHub </button>
+
       }
       }
       <button mat-raised-button (click)="entities()">Entidades</button>

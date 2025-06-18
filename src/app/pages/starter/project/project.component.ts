@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectService } from 'src/app/services/project.service';
-import { ProyectForm } from 'src/app/models/proyect.model';
+import { GitHubUploadDto, ProyectForm } from 'src/app/models/proyect.model';
 import { DialogoConfirmacionComponent } from 'src/app/_shared/dialogo-confirmacion/dialogo-confirmacion.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +15,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validatio
 import { MatInputModule } from '@angular/material/input';
 import { MessageService } from 'src/app/services/message.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { GitHubUploadDialogComponent } from './github-upload-dialog/github-upload-dialog.component';
 
 @Component({
   selector: 'app-project',
@@ -184,7 +185,19 @@ generate() {
 }
 
 uploadGithub() {
-  alert('Funcionalidad de subir a GitHub no implementada aún');
+  if (!this.projectId) return;
+  const dialogRef = this.dialog.open(GitHubUploadDialogComponent, {
+    width: '400px',
+    data: { projectId: this.projectId }
+  });
+  dialogRef.afterClosed().subscribe((dto: GitHubUploadDto) => {
+    if (dto) {
+      this.projectService.uploadProjectToGitHub(this.projectId!, dto).subscribe({
+        next: () => this.messageService.message('Proyecto subido a GitHub correctamente', 'success'),
+        error: () => this.messageService.message('Error al subir a GitHub', 'error')
+      });
+    }
+  });
 }
 
 entities() {

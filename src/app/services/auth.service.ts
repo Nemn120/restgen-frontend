@@ -8,6 +8,7 @@ import { HttpService } from './http.service';
 import { Role } from '../models/role.model';
 import { environment } from 'src/environments/environment';
 import { UserRegister } from '../models/user.register.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -16,7 +17,11 @@ export class AuthService {
   static readonly END_POINT_USERS = environment.URI + '/users';
   private user: User;
 
-  constructor(private readonly httpService: HttpService, private readonly router: Router) {
+
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly router: Router,
+    private readonly http: HttpClient) {
   }
 
   login(email: string, password: string): Observable<User> {
@@ -37,7 +42,7 @@ export class AuthService {
             name: decodedToken.name,
             role: decodedToken.role
           };
-
+          localStorage.setItem('token', this.user.token);
           return this.user;
         }),
         catchError(error => {
@@ -82,11 +87,45 @@ export class AuthService {
   }
 
   getToken(): string {
-    return this.user ? this.user.token : undefined;
+    return localStorage.getItem('token');
+  }
+
+  getTokenGithub(){
+    const jwtHelper = new JwtHelperService();
+     const decodedToken = jwtHelper.decodeToken(this.getToken());
+     return decodedToken['token-github'];
   }
 
   getUser(): User {
     return this.user;
+  }
+
+  goToGithubAcces() {
+    return this.http.get(AuthService.END_POINT + 'http://localhost:8080/restgen/user-info');
+  }
+
+  redirectToGitHubLogin() {
+    window.location.href = 'http://localhost:8080/restgen/oauth2/authorization/github';
+  }
+
+  getGitHubUserInfo(code: string, state: string): Observable<User> {
+    return this.httpService.get(AuthService.END_POINT + '/github/' + code + '/state/' + state)
+      .pipe(
+        map((data: any) => {
+          this.user = {
+            token: data.token,
+            email: data.email,
+            name: data.name,
+            role: data.role
+          };
+          localStorage.setItem('token', data.token);
+          return this.user;
+        }),
+        catchError(error => {
+          console.error('Login failed:', error);
+          return throwError(() => new Error('Login failed. Please check your credentials.'));
+        })
+      )
   }
 
 }

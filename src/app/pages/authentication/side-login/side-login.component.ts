@@ -6,10 +6,11 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-side-login',
-  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule],
+  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, MatButtonModule],
   templateUrl: './side-login.component.html',
   styleUrl: './side-login.component.scss'
 
@@ -44,5 +45,11 @@ export class AppSideLoginComponent {
       console.log('Formulario inválido');
     }
   }
+
+  loginGithub() {
+    this.authService.redirectToGitHubLogin();
+  }
+
+
 
 }

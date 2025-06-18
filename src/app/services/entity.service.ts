@@ -8,7 +8,7 @@ import { ClassModel, FindAllEntities } from '../models/proyect.model';
 })
 export class EntityService {
 
-    static readonly END_POINT = environment.URI + '/api/entities';
+  static readonly END_POINT = environment.URI + '/api/entities';
 
   constructor(private http: HttpClient) { }
 
@@ -27,4 +27,5 @@ export class EntityService {
   delete(projectId: string, entityId: string) {
     return this.http.delete<any>(`${EntityService.END_POINT}/project/${projectId}/class/${entityId}`);
   }
+
 }

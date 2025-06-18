@@ -135,3 +135,10 @@ export interface FindAllEntities {
   tableName: String;
   apiName?: string;
 }
+
+export interface GitHubUploadDto {
+  projectName: string;
+  description: string;
+  isPrivate: boolean;
+  githubToken:string;
+}
