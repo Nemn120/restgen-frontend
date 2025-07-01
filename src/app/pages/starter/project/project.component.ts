@@ -105,106 +105,141 @@ export class ProjectComponent implements OnInit {
   }
 
 
-loadProject(id: string): void {
-  this.projectService.findById(id).subscribe({
-    next: (project: ProyectForm) => {
-      this.projectForm.patchValue(project);
-      this.existsClass = project.classes && project.classes.length > 0;
-      this.status = project.status;
-    },
-    error: () => {
-      alert('Error al cargar el proyecto');
-      this.router.navigate(['project']);
-    }
-  });
-}
+  loadProject(id: string): void {
+    this.projectService.findById(id).subscribe({
+      next: (project: ProyectForm) => {
+        this.projectForm.patchValue(project);
+        this.existsClass = project.classes && project.classes.length > 0;
+        this.status = project.status;
+      },
+      error: () => {
+        alert('Error al cargar el proyecto');
+        this.router.navigate(['project']);
+      }
+    });
+  }
 
-createProject(): void {
-  if(this.projectForm.invalid) {
-  this.projectForm.markAllAsTouched();
-  return;
-}
-const params = {
-  title: this.title,
-  description: this.editMode ? '¿Está seguro de actualizar el proyecto?' : '¿Está seguro de crear el proyecto?',
-  inputData: true
-};
-this.dialog.open(DialogoConfirmacionComponent, {
-  data: params, hasBackdrop: false
-})
-  .afterClosed()
-  .subscribe(confirmado => {
-    if (confirmado) {
-      if (this.editMode && this.projectId) {
-        this.projectService.update(this.projectId, this.projectForm.value).subscribe({
-          next: () => {
-            this.messageService.message('Proyecto actualizado correctamente', 'success');
-            this.router.navigate(['project']);
-          },
-          error: () => {
-            this.messageService.message('Error al actualizar el proyecto', 'error');
+  createProject(): void {
+    if (this.projectForm.invalid) {
+      this.projectForm.markAllAsTouched();
+      return;
+    }
+    const params = {
+      title: this.title,
+      description: this.editMode ? '¿Está seguro de actualizar el proyecto?' : '¿Está seguro de crear el proyecto?',
+      inputData: true
+    };
+    this.dialog.open(DialogoConfirmacionComponent, {
+      data: params, hasBackdrop: false
+    })
+      .afterClosed()
+      .subscribe(confirmado => {
+        if (confirmado) {
+          if (this.editMode && this.projectId) {
+            this.projectService.update(this.projectId, this.projectForm.value).subscribe({
+              next: () => {
+                this.messageService.message('Proyecto actualizado correctamente', 'success');
+                this.router.navigate(['project']);
+              },
+              error: () => {
+                this.messageService.message('Error al actualizar el proyecto', 'error');
+              }
+            });
+          } else {
+            this.projectService.create(this.projectForm.value).subscribe({
+              next: () => {
+                this.messageService.message('Proyecto creado correctamente', 'success');
+                this.router.navigate(['project']);
+              },
+              error: () => {
+                this.messageService.message('Error al crear el proyecto', 'error');
+              }
+            });
           }
-        });
-      } else {
-        this.projectService.create(this.projectForm.value).subscribe({
-          next: () => {
-            this.messageService.message('Proyecto creado correctamente', 'success');
-            this.router.navigate(['project']);
-          },
-          error: () => {
-            this.messageService.message('Error al crear el proyecto', 'error');
-          }
+        }
+      });
+  }
+
+  cancelar(): void {
+    this.router.navigate(['project']);
+  }
+
+  download() {
+    if (this.projectId) {
+      this.projectService.downloadProjectByUuid(this.projectId);
+    } else {
+      this.messageService.message('No hay proyecto para descargar', 'warning');
+    }
+  }
+
+  viewProject() {
+    this.router.navigate(['project/view', this.projectId]);
+  }
+
+  generate() {
+    const params = {
+      title: 'Generar proyecto',
+      description: '¿Está seguro de generar el proyecto?',
+      inputData: true
+    };
+    this.dialog.open(DialogoConfirmacionComponent, {
+      data: params, hasBackdrop: false
+    })
+      .afterClosed()
+      .subscribe(confirmado => {
+        if (confirmado) {
+          this.projectService.generate(this.projectId).subscribe(
+            () => {
+              this.loadProject(this.projectId);
+              this.messageService.message('Proyecto generado correctamente', 'success');
+            });
+        }
+      });
+  }
+
+  clone() {
+    const params = {
+      title: 'Clonar proyecto',
+      description: '¿Está seguro de clonar el proyecto?',
+      inputData: true
+    };
+    this.dialog.open(DialogoConfirmacionComponent, {
+      data: params, hasBackdrop: false
+    })
+      .afterClosed()
+      .subscribe(confirmado => {
+        if (confirmado) {
+          this.projectService.generate(this.projectId).subscribe(
+            () => {
+              this.loadProject(this.projectId);
+              this.messageService.message('Proyecto clonado correctamente', 'success');
+            });
+        }
+      });
+  }
+
+
+  uploadGithub() {
+    if (!this.projectId) return;
+    const dialogRef = this.dialog.open(GitHubUploadDialogComponent, {
+      width: '400px',
+      data: { projectId: this.projectId }
+    });
+    dialogRef.afterClosed().subscribe((dto: GitHubUploadDto) => {
+      if (dto) {
+        this.projectService.uploadProjectToGitHub(this.projectId!, dto).subscribe({
+          next: () => this.messageService.message('Proyecto subido a GitHub correctamente', 'success'),
+          error: () => this.messageService.message('Error al subir a GitHub', 'error')
         });
       }
-    }
-  });
-  }
-
-cancelar(): void {
-  this.router.navigate(['project']);
-}
-
-download() {
-  if (this.projectId) {
-    this.projectService.downloadProjectByUuid(this.projectId);
-  } else {
-    this.messageService.message('No hay proyecto para descargar', 'warning');
-  }
-}
-
-viewProject() {
-  this.router.navigate(['project/view', this.projectId]);
-}
-
-generate() {
-  this.projectService.generate(this.projectId).subscribe(
-    () => {
-      this.loadProject(this.projectId);
-      this.messageService.message('Proyecto generado correctamente', 'success');
     });
-}
-
-uploadGithub() {
-  if (!this.projectId) return;
-  const dialogRef = this.dialog.open(GitHubUploadDialogComponent, {
-    width: '400px',
-    data: { projectId: this.projectId }
-  });
-  dialogRef.afterClosed().subscribe((dto: GitHubUploadDto) => {
-    if (dto) {
-      this.projectService.uploadProjectToGitHub(this.projectId!, dto).subscribe({
-        next: () => this.messageService.message('Proyecto subido a GitHub correctamente', 'success'),
-        error: () => this.messageService.message('Error al subir a GitHub', 'error')
-      });
-    }
-  });
-}
-
-entities() {
-  if (this.projectId) {
-    this.router.navigate(['project', this.projectId, 'entities']);
   }
-}
+
+  entities() {
+    if (this.projectId) {
+      this.router.navigate(['project', this.projectId, 'entities']);
+    }
+  }
 
 }
 
@@ -227,3 +262,5 @@ export function mavenVersionValidator(): ValidatorFn {
     return valid ? null : { invalidMavenVersion: true };
   };
 }
+
+
