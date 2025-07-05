@@ -2,13 +2,13 @@
   <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
     <span style="padding-left: 20px">{{ title }}</span>
     <span style="display: flex; gap: 8px;">
-      <button mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
+      <button *ngIf="!viewMode" mat-raised-button class="bg-light-primary" (click)="createProject()" type="button">Guardar</button>
       @if (projectId) {
       @if(this.existsClass) {
-      <button mat-raised-button class="bg-light-secondary" (click)="generate()">Generar</button>
+      <button *ngIf="!viewMode" mat-raised-button class="bg-light-secondary" (click)="generate()">Generar</button>
       @if(this.status === 'GENERATED') {
       <button mat-raised-button (click)="download()">Descargar</button>
-      <button mat-raised-button class="bg-light-warning" (click)="uploadGithub()">
+      <button *ngIf="!viewMode" mat-raised-button class="bg-light-warning" (click)="uploadGithub()">
         <img src="assets/images/icons8-github.svg" alt="GitHub" width="20" height="20"
           style="vertical-align: middle; margin-right: 8px;">
         Subir a GitHub </button>
@@ -25,20 +25,20 @@
       <div style="display: flex; gap: 16px;">
         <mat-form-field appearance="fill" style="flex: 1;">
           <mat-label>Nombre</mat-label>
-          <input matInput formControlName="name" required>
+          <input [readonly]="viewMode" matInput formControlName="name" required>
           <mat-error *ngIf="projectForm.get('name')?.hasError('required')">Campo requerido</mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill" style="flex:1;">
           <mat-label>Estado</mat-label>
           <input matInput formControlName="status" readonly="true">
         </mat-form-field>
-        <mat-checkbox formControlName="isPrivate">Privado</mat-checkbox>
+        <mat-checkbox [disabled]="viewMode" formControlName="isPrivate">Privado</mat-checkbox>
       </div>
 
 
       <mat-form-field appearance="fill" style="width: 100%;">
         <mat-label>Descripción</mat-label>
-        <textarea matInput formControlName="description" required></textarea>
+        <textarea [readonly]="viewMode" matInput formControlName="description" required></textarea>
         <mat-error *ngIf="projectForm.get('description')?.hasError('required')">Campo requerido</mat-error>
       </mat-form-field>
 
@@ -47,11 +47,11 @@
         <div [formGroupName]="'application'" style="display: flex; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Ruta base</mat-label>
-            <input matInput formControlName="basePath" matTooltip="Ruta base para los endpoints de la API">
+            <input [readonly]="viewMode" matInput formControlName="basePath" matTooltip="Ruta base para los endpoints de la API">
           </mat-form-field>
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Puerto</mat-label>
-            <input matInput type="number" formControlName="port" matTooltip="Puerto donde se ejecutará la aplicación">
+            <input [readonly]="viewMode" matInput type="number" formControlName="port" matTooltip="Puerto donde se ejecutará la aplicación">
           </mat-form-field>
         </div>
 
@@ -59,17 +59,17 @@
         <div [formGroupName]="'maven'" style="display: flex; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>GroupId</mat-label>
-            <input matInput formControlName="groupId"
+            <input [readonly]="viewMode" matInput formControlName="groupId"
               matTooltip="Identificador único del grupo Maven (ej: com.ejemplo)">
           </mat-form-field>
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>ArtifactId</mat-label>
-            <input matInput formControlName="artifactId"
+            <input [readonly]="viewMode" matInput formControlName="artifactId"
               matTooltip="Identificador único del artefacto Maven (ej: mi-proyecto)">
           </mat-form-field>
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Versión</mat-label>
-            <input matInput formControlName="version" matTooltip="Versión del artefacto Maven (ej: 1.0.0)">
+            <input [readonly]="viewMode" matInput formControlName="version" matTooltip="Versión del artefacto Maven (ej: 1.0.0)">
           </mat-form-field>
         </div>
 
@@ -77,7 +77,7 @@
         <div [formGroupName]="'security'" style="display: flex; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Secret Key</mat-label>
-            <input matInput formControlName="secretKey" matTooltip="Clave secreta para la seguridad de la aplicación">
+            <input [readonly]="viewMode" matInput formControlName="secretKey" matTooltip="Clave secreta para la seguridad de la aplicación">
           </mat-form-field>
         </div>
 
@@ -86,44 +86,44 @@
           <div style="display: flex; gap: 16px;">
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Título</mat-label>
-              <input matInput formControlName="title">
+              <input [readonly]="viewMode"  matInput formControlName="title">
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Versión</mat-label>
-              <input matInput formControlName="version">
+              <input  [readonly]="viewMode" matInput formControlName="version">
             </mat-form-field>
           </div>
           <mat-form-field appearance="fill" style="width: 100%;">
             <mat-label>Descripción</mat-label>
-            <textarea matInput formControlName="description"></textarea>
+            <textarea  [readonly]="viewMode" matInput formControlName="description"></textarea>
           </mat-form-field>
           <div style="display: flex; gap: 16px;">
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Nombre de Contacto</mat-label>
-              <input matInput formControlName="contactName">
+              <input  [readonly]="viewMode" matInput formControlName="contactName">
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>URL de Contacto</mat-label>
-              <input matInput formControlName="contactUrl">
+              <input  [readonly]="viewMode" matInput formControlName="contactUrl">
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Email de Contacto</mat-label>
-              <input matInput formControlName="contactEmail">
+              <input [readonly]="viewMode" matInput formControlName="contactEmail">
             </mat-form-field>
           </div>
 
           <div style="display: flex; gap: 16px;">
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>Nombre de Licencia</mat-label>
-              <input matInput formControlName="licenseName">
+              <input [readonly]="viewMode" matInput formControlName="licenseName">
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>URL de Licencia</mat-label>
-              <input matInput formControlName="licenseUrl">
+              <input [readonly]="viewMode" matInput formControlName="licenseUrl">
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;">
               <mat-label>URL Términos de Servicio</mat-label>
-              <input matInput formControlName="termsOfServiceUrl">
+              <input [readonly]="viewMode" matInput formControlName="termsOfServiceUrl">
             </mat-form-field>
           </div>
         </div>

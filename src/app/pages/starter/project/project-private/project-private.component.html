@@ -1,6 +1,7 @@
 <mat-card>
   <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
-    <span style="padding-left: 20px">Proyectos publicos</span>
+    <span style="padding-left: 20px">Mis proyectos</span>
+    <button mat-raised-button class="bg-light-primary" (click)="newProject()">Crear nuevo proyecto</button>
   </mat-card-title>
   <mat-card-content>
     <div class="layout-data">
@@ -25,8 +26,7 @@
             <td mat-cell *matCellDef="let row">
               <mat-chip-set>
                 <mat-chip [ngClass]="{
-                    'bg-light-primary': row.status === 'NEW',
-                    'bg-light-secondary': row.status === 'CREATED',
+                    'bg-light-primary': row.status === 'CREATED',
                     'bg-light-success': row.status === 'CLONED',
                     'bg-light-warning': row.status === 'GENERATED',
                     'bg-light-error': row.status === 'ERROR'
@@ -62,13 +62,14 @@
             <td mat-cell *matCellDef="let row">{{row.updateDate | date: 'dd/MM/yyyy HH:mm:ss'}}</td>
           </ng-container>
 
-
-
-            <ng-container matColumnDef="actions">
+         <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef style="width: 11%;">Acciones</th>
             <td mat-cell *matCellDef="let row">
-              <button mat-icon-button (click)="viewProject(row)" color="primary">
-                <mat-icon color="primary">visibility</mat-icon>
+              <button mat-icon-button (click)="updateProject(row)" color="primary">
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteProject(row)">
+                <mat-icon color="accent">delete</mat-icon>
               </button>
             </td>
           </ng-container>

@@ -42,6 +42,7 @@ export class ProjectComponent implements OnInit {
   projectId: string | null = null;
   existsClass = false;
   status: string | null = null;
+  viewMode = false;
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -57,7 +58,7 @@ export class ProjectComponent implements OnInit {
       description: ['', Validators.required],
       urlRepository: [''],
       plantUmlDiagram: [''],
-      isPrivate: [false],
+      isPrivate: [true],
       creationUser: [''],
       creationDate: [''],
       updateUser: [''],
@@ -91,17 +92,25 @@ export class ProjectComponent implements OnInit {
 
     });
 
+    const path = this.route.snapshot.routeConfig?.path;
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
-      if (id) {
+
+      if (path?.startsWith('view')) {
+        this.viewMode = true;
+        this.title = 'Ver proyecto';
+        //this.projectForm.disable();
+      } else if (path?.startsWith('edit')) {
         this.editMode = true;
         this.title = 'Editar proyecto';
+      }
+
+      if (id) {
         this.projectId = id;
         this.loadProject(id);
       }
     });
-
-
   }
 
 
@@ -114,7 +123,7 @@ export class ProjectComponent implements OnInit {
       },
       error: () => {
         alert('Error al cargar el proyecto');
-        this.router.navigate(['project']);
+        this.cancelar();
       }
     });
   }
@@ -139,7 +148,7 @@ export class ProjectComponent implements OnInit {
             this.projectService.update(this.projectId, this.projectForm.value).subscribe({
               next: () => {
                 this.messageService.message('Proyecto actualizado correctamente', 'success');
-                this.router.navigate(['project']);
+                this.loadProject(this.projectId);
               },
               error: () => {
                 this.messageService.message('Error al actualizar el proyecto', 'error');
@@ -147,9 +156,10 @@ export class ProjectComponent implements OnInit {
             });
           } else {
             this.projectService.create(this.projectForm.value).subscribe({
-              next: () => {
+              next: (data) => {
+                this.projectId = data.id
                 this.messageService.message('Proyecto creado correctamente', 'success');
-                this.router.navigate(['project']);
+                this.loadProject(data.id);
               },
               error: () => {
                 this.messageService.message('Error al crear el proyecto', 'error');
@@ -161,12 +171,17 @@ export class ProjectComponent implements OnInit {
   }
 
   cancelar(): void {
-    this.router.navigate(['project']);
+    if(this.viewMode){
+      this.router.navigate(['../']);
+    }else{
+      this.router.navigate(['project/my']);
+    }
+
   }
 
   download() {
     if (this.projectId) {
-      this.projectService.downloadProjectByUuid(this.projectId);
+      this.projectService.downloadProjectByUuid(this.projectId, this.projectForm.value.properties.maven.artifactId);
     } else {
       this.messageService.message('No hay proyecto para descargar', 'warning');
     }
@@ -209,10 +224,10 @@ export class ProjectComponent implements OnInit {
       .afterClosed()
       .subscribe(confirmado => {
         if (confirmado) {
-          this.projectService.generate(this.projectId).subscribe(
-            () => {
-              this.loadProject(this.projectId);
+          this.projectService.clone(this.projectId).subscribe(
+            (data) => {
               this.messageService.message('Proyecto clonado correctamente', 'success');
+              this.router.navigate(['project/edit', data.id]);
             });
         }
       });
@@ -237,7 +252,11 @@ export class ProjectComponent implements OnInit {
 
   entities() {
     if (this.projectId) {
-      this.router.navigate(['project', this.projectId, 'entities']);
+      const mode = this.viewMode ? 'view' : 'edit';
+      this.router.navigate(
+        ['project', this.projectId, 'entities'],
+        { queryParams: { mode } }
+      );
     }
   }
 

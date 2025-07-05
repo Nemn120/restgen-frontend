@@ -3,7 +3,7 @@
     <span style="padding-left: 20px">Entidades del Proyecto</span>
     <span style="display: flex; gap: 8px;">
 
-      <button mat-raised-button class="bg-light-primary" (click)="goToCreateEntity()">Nueva Entidad</button>
+      <button *ngIf="!viewMode" mat-raised-button class="bg-light-primary" (click)="goToCreateEntity()">Nueva Entidad</button>
       <button mat-raised-button class="bg-light-success" (click)="viewDiagram()">Ver diagrama</button>
       <button mat-raised-button class="bg-light-error" (click)="goBack()">Regresar</button>
     </span>
@@ -25,14 +25,20 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Acciones</th>
         <td mat-cell *matCellDef="let entity">
-          <button mat-icon-button (click)="editEntity(entity)">
-            <mat-icon color="primary">edit</mat-icon>
+          @if (!viewMode) {
+            <button mat-icon-button (click)="editEntity(entity)">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteEntity(entity)">
+              <mat-icon color="secondary">delete</mat-icon>
+            </button>
+          }
+          @else{
+            <button mat-icon-button (click)="viewEntity(entity)">
+              <mat-icon color="primary">visibility</mat-icon>
+            </button>
+          }
 
-          </button>
-          <button mat-icon-button (click)="deleteEntity(entity)">
-            <mat-icon color="secondary">delete</mat-icon>
-
-          </button>
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="['name', 'tableName','apiName', 'actions']"></tr>

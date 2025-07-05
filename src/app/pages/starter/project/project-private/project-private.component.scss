@@ -37,12 +37,3 @@ table {
   text-align: center;
   letter-spacing: 1px;
 }
-
-
-input:disabled, textarea:disabled, select:disabled {
-  background-color: #fff !important;
-  color: #000 !important;
-  opacity: 1 !important;
-  border: 1px solid #ccc !important;
-  cursor: default;
-}

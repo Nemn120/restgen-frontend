@@ -2,7 +2,7 @@
   <mat-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between;">
     <span style="padding-left: 20px">{{ editMode ? 'Editar Entidad' : 'Nueva Entidad' }}</span>
     <span style="display: flex; gap: 8px;">
-      <button mat-raised-button class="bg-light-primary" (click)="saveEntity()">Guardar</button>
+      <button *ngIf="!viewMode" mat-raised-button class="bg-light-primary" (click)="saveEntity()">Guardar</button>
       <button mat-raised-button class="bg-light-error" (click)="cancel()">Regresar</button>
     </span>
   </mat-card-title>
@@ -11,7 +11,7 @@
       <div style="display: flex; gap: 16px;">
         <mat-form-field appearance="fill" style="flex:1;">
           <mat-label>Nombre de la Entidad</mat-label>
-          <input matInput formControlName="name">
+          <input [readonly]="viewMode" matInput formControlName="name">
           <mat-error *ngIf="entityForm.get('name')?.hasError('notUnique')">
             El nombre ya existe.
           </mat-error>
@@ -19,7 +19,7 @@
 
         <mat-form-field appearance="fill" style="flex:1;">
           <mat-label>Nombre API</mat-label>
-          <input matInput formControlName="apiName" required>
+          <input [readonly]="viewMode" matInput formControlName="apiName" required>
           <mat-error *ngIf="entityForm.get('apiName')?.hasError('required')">
             El nombre API es requerido.
           </mat-error>
@@ -31,13 +31,13 @@
         <div formGroupName="entity" style="display: flex; flex:2; gap: 16px;">
           <mat-form-field appearance="fill" style="flex:1;">
             <mat-label>Nombre de la Tabla</mat-label>
-            <input matInput formControlName="tableName">
+            <input [readonly]="viewMode" matInput formControlName="tableName">
             <mat-error *ngIf="entityForm.get('entity.tableName')?.hasError('notUnique')">
               El nombre de la tabla ya existe.
             </mat-error>
           </mat-form-field>
         </div>
-        <mat-checkbox (change)="isSuperClass = $event.checked">
+        <mat-checkbox [disabled]="viewMode" (change)="isSuperClass = $event.checked">
           ¿Super clase?
         </mat-checkbox>
       </div>
@@ -64,7 +64,7 @@
                 <mat-form-field appearance="fill" style="width: 100%;"
                   matTooltip="Valor del discriminador para esta entidad hija (@DiscriminatorValue)">
                   <mat-label>Valor</mat-label>
-                  <input matInput formControlName="value" placeholder="Ej: EMPLEADO">
+                  <input [readonly]="viewMode" matInput formControlName="value" placeholder="Ej: EMPLEADO">
                 </mat-form-field>
               </div>
             </div>
@@ -85,8 +85,8 @@
                     <mat-option [value]="null">Ninguna</mat-option>
                     <mat-option value="SINGLE_TABLE">SINGLE_TABLE</mat-option>
                     <mat-option value="JOINED">JOINED</mat-option>
-                    <mat-option value="TABLE_PER_CLASS">TABLE_PER_CLASS</mat-option>
-                  </mat-select>
+<!--                     <mat-option value="TABLE_PER_CLASS">TABLE_PER_CLASS</mat-option>
+ -->                  </mat-select>
                 </mat-form-field>
               </div>
               <div style="flex: 1;">
@@ -96,7 +96,7 @@
                     <mat-form-field appearance="fill" style="width: 100%;"
                       matTooltip="Nombre de la columna discriminadora para herencia JPA">
                       <mat-label>Nombre columna</mat-label>
-                      <input matInput formControlName="name" placeholder="Ej: tipo_empleado">
+                      <input [readonly]="viewMode" matInput formControlName="name" placeholder="Ej: tipo_empleado">
                     </mat-form-field>
                   </div>
                 </div>
@@ -125,13 +125,13 @@
             <mat-form-field appearance="fill" style="flex:1;"
               matTooltip="Nombre de la secuencia para la generación de IDs">
               <mat-label>Nombre</mat-label>
-              <input matInput formControlName="name" placeholder="Ej: seq_entity_id">
+              <input [readonly]="viewMode" matInput formControlName="name" placeholder="Ej: seq_entity_id">
 
             </mat-form-field>
             <mat-form-field appearance="fill" style="flex:1;"
               matTooltip="Incremento de la secuencia (valor de incremento para cada nuevo ID)">
               <mat-label>Incremento</mat-label>
-              <input matInput type="number" formControlName="increment" placeholder="Ej: 1">
+              <input [readonly]="viewMode" matInput type="number" formControlName="increment" placeholder="Ej: 1">
 
             </mat-form-field>
           </div>
@@ -145,7 +145,7 @@
                 Propiedades
               </mat-panel-title>
             </mat-expansion-panel-header>
-            <button mat-button color="primary" (click)="openRelationDialog('column')" type="button">
+            <button *ngIf="!viewMode" mat-button color="primary" (click)="openRelationDialog('column')" type="button">
               Agregar propiedad
             </button>
             <table mat-table [dataSource]="columnItems" class="mat-elevation-z1" style="width: 100%;">
@@ -207,7 +207,7 @@
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Acciones</th>
                 <td mat-cell *matCellDef="let col; let i = index">
-                  <button mat-icon-button color="warn" (click)="removeColumnByType(i, 'column')" type="button">
+                  <button *ngIf="!viewMode" mat-icon-button color="warn" (click)="removeColumnByType(i, 'column')" type="button">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>
@@ -226,7 +226,7 @@
                 Relaciones
               </mat-panel-title>
             </mat-expansion-panel-header>
-            <button mat-button color="primary" (click)="openRelationDialog('relation')" type="button">Agregar
+            <button *ngIf="!viewMode" mat-button color="primary" (click)="openRelationDialog('relation')" type="button">Agregar
               relación</button>
             <table mat-table [dataSource]="relationItems" class="mat-elevation-z1" style="width: 100%;">
               <ng-container matColumnDef="name">
@@ -259,7 +259,7 @@
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Acciones</th>
                 <td mat-cell *matCellDef="let rel; let i = index">
-                  <button mat-icon-button color="warn" (click)="removeColumnByType(i, 'relation')" type="button">
+                  <button *ngIf="!viewMode" mat-icon-button color="warn" (click)="removeColumnByType(i, 'relation')" type="button">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>

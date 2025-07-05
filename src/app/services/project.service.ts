@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { GitHubUploadDto, Proyect, ProyectForm } from '../models/proyect.model';
+import { GitHubUploadDto, Proyect, ProyectForm, ProyectId } from '../models/proyect.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -23,10 +23,14 @@ export class ProjectService {
   }
 
   create(value: Proyect) {
-    return this.http.post<any>(ProjectService.END_POINT, value);
+    value.creationUser = this.authService.getEmail();
+    value.updateUser = this.authService.getEmail();
+    return this.http.post<ProyectId>(ProjectService.END_POINT, value);
   }
 
   update(projectId: string, value: Proyect) {
+    value.updateUser = this.authService.getEmail();
+    console.log('Updating project with ID:', projectId, 'with value:', value);
     return this.http.put<Proyect>(`${ProjectService.END_POINT}/${projectId}`, value);
   }
 
@@ -34,10 +38,14 @@ export class ProjectService {
     return this.http.get<ProyectForm>(`${ProjectService.END_POINT}/${uuid}`);
   }
 
-  public downloadProjectByUuid(uuid: String) {
+   findByUser() {
+    return this.http.get<Proyect[]>(`${ProjectService.END_POINT}/my-projects`);
+  }
+
+  public downloadProjectByUuid(uuid: String, artifactId: string) {
     this.http.get(`${ProjectService.END_POINT}/${uuid}/download`, { responseType: "blob" })
       .subscribe(blob => {
-        saveAs(blob, uuid + '.zip');
+        saveAs(blob, artifactId + '.zip');
       });
   }
 
@@ -59,6 +67,10 @@ export class ProjectService {
   uploadProjectToGitHub(projectId: string, dto: GitHubUploadDto): Observable<any> {
     dto.githubToken = this.authService.getTokenGithub();
     return this.http.post(`${ProjectService.END_POINT}/upload/${projectId}`, dto);
+  }
+
+  clone(uuid: string) {
+    return this.http.get<ProyectId>(`${ProjectService.END_POINT}/${uuid}/clone`);
   }
 
 }

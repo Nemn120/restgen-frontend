@@ -58,6 +58,8 @@ export class EntityFormComponent implements OnInit {
   columnDisplayedColumns = ['name', 'type', 'actions'];
   relationDisplayedColumns = ['name', 'type', 'target', 'actions'];
 
+  viewMode = false;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -99,6 +101,11 @@ export class EntityFormComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       this.projectId = params.get('id');
       this.entityName = params.get('entityName');
+
+      this.route.queryParamMap.subscribe(query => {
+        this.viewMode = query.get('mode') === 'view';
+      });
+
       if (this.entityName) {
         this.editMode = true;
         this.findEntityByName();
@@ -145,7 +152,9 @@ export class EntityFormComponent implements OnInit {
       .subscribe({
         next: (classModel) => {
           this.setEntityForm(classModel);
-          this.isSuperClass = !!classModel.entity.extendsClass;
+          setTimeout(() => {
+            this.isSuperClass = !classModel.entity.extendsClass;
+          });
         },
         error: (err) => {
           console.error('Error al cargar la entidad:', err);
@@ -158,7 +167,6 @@ export class EntityFormComponent implements OnInit {
       const value = control.value?.trim().toLowerCase();
       if (!value) return null;
 
-      // Filtra nulos y excluye el nombre original
       const filteredNames = (originalName
         ? existingNames.filter(n => n && n.toLowerCase() !== originalName.trim().toLowerCase())
         : existingNames.filter(n => n)
@@ -298,6 +306,12 @@ export class EntityFormComponent implements OnInit {
       this.entityForm.get('entity.options.uniqueConstraints')?.setValue(classModel.entity.options.uniqueConstraints);
     }
 
+    if (classModel.entity.extendsClass) {
+      this.entityForm.get('entity.options.discriminator.value')?.setValue(classModel.entity.options.discriminator.value);
+      this.entityForm.get('entity.extendsClass')?.setValue(classModel.entity.extendsClass);
+      console.log(this.entityForm.value)
+    }
+
     this.columns.clear();
     (classModel.entity.columns || []).forEach((col: any) => {
       this.columns.push(this.fb.group({
@@ -360,15 +374,24 @@ export class EntityFormComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    const mode = this.route.snapshot.queryParamMap.get('mode') || 'edit';
+
+    this.router.navigate(['../'], {
+      relativeTo: this.route,
+      queryParams: { mode }
+    });
   }
+
 
   get columnNames(): string[] {
     return this.columns.controls.map(col => col.get('property.name')?.value).filter(Boolean);
   }
 
   openRelationDialog(mode: 'column' | 'relation') {
-    const entityNames = this.entities.map(e => e.name);
+    let entityNames: any[] = [];
+    if (this.entities != null) {
+      entityNames = this.entities.map(e => e.name);
+    }
 
     const dialogRef = this.dialog.open(RelationDialogComponent, {
       width: '900px',

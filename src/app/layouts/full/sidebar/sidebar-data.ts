@@ -9,4 +9,9 @@ export const navItems: NavItem[] = [
     iconName: 'solar:atom-line-duotone',
     route: '/project',
   },
+  {
+    displayName: 'Mis proyectos',
+    iconName: 'solar:atom-line-duotone',
+    route: '/project/my',
+  },
 ];

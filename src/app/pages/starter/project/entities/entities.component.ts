@@ -1,7 +1,7 @@
 import { EntityService } from './../../../../services/entity.service';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,7 +13,6 @@ import { DialogoConfirmacionComponent } from 'src/app/_shared/dialogo-confirmaci
 import { ClassModel, FindAllEntities } from 'src/app/models/proyect.model';
 import { MessageService } from 'src/app/services/message.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { DiagramViewComponent } from '../../diagram-view/diagram-view.component';
 import { EntityDiagramDialogComponent } from './entity-diagram-dialog/entity-diagram-dialog.component';
 
 @Component({
@@ -35,7 +34,7 @@ export class EntitiesComponent implements OnInit {
 
   projectId: string | null = null;
   entities: FindAllEntities[] = [];
-
+  viewMode = false;
   constructor(private route: ActivatedRoute, private router: Router,
     private entityService: EntityService,
     private messageService: MessageService,
@@ -48,7 +47,11 @@ export class EntitiesComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.projectId = params.get('id');
-      this.findEntities();
+
+      this.route.queryParamMap.subscribe(query => {
+        this.viewMode = query.get('mode') === 'view';
+        this.findEntities();
+      });
     });
   }
 
@@ -63,12 +66,27 @@ export class EntitiesComponent implements OnInit {
     this.router.navigate(['project', this.projectId, 'entities', 'new']);
   }
 
-  editEntity(entity: any) {
-    this.router.navigate(['project', this.projectId, 'entities', entity.name]);
+  editEntity(entity: ClassModel) {
+    this.router.navigate(
+      ['project', this.projectId, 'entities', entity.name],
+      { queryParams: { mode: 'edit' } }
+    );
+  }
+
+  viewEntity(entity: ClassModel) {
+    this.router.navigate(
+      ['project', this.projectId, 'entities', entity.name],
+      { queryParams: { mode: 'view' } }
+    );
   }
 
   goBack() {
-    this.router.navigate(['project/edit', this.projectId]);
+    if(this.viewMode) {
+      this.router.navigate(['project/view', this.projectId]);
+    }
+    else{
+      this.router.navigate(['project/edit', this.projectId]);
+    }
   }
 
   deleteEntity(entity: ClassModel) {

@@ -58,6 +58,10 @@ export interface ProyectForm {
   classes?: ClassModel[];
 }
 
+export interface ProyectId {
+  id: string
+}
+
 export interface ClassModel {
   name: string;
   entity: EntityModel;
