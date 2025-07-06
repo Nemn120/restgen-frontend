@@ -11,7 +11,7 @@ export const navItems: NavItem[] = [
   },
   {
     displayName: 'Mis proyectos',
-    iconName: 'solar:atom-line-duotone',
+    iconName: 'solar:folder-open-outline',
     route: '/project/my',
   },
 ];

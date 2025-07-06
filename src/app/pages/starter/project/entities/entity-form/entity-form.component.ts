@@ -56,7 +56,7 @@ export class EntityFormComponent implements OnInit {
   originalApiName: string | null = null;
 
   columnDisplayedColumns = ['name', 'type', 'actions'];
-  relationDisplayedColumns = ['name', 'type', 'target', 'actions'];
+  relationDisplayedColumns = ['name', 'type', 'target', 'adicional','actions'];
 
   viewMode = false;
 
@@ -167,12 +167,12 @@ export class EntityFormComponent implements OnInit {
       const value = control.value?.trim().toLowerCase();
       if (!value) return null;
 
-      const filteredNames = (originalName
-        ? existingNames.filter(n => n && n.toLowerCase() !== originalName.trim().toLowerCase())
-        : existingNames.filter(n => n)
-      ) as string[];
+      const normalizedOriginal = originalName ? originalName.trim().toLowerCase() : null;
+      const filteredNames = existingNames
+        .filter(n => n && n.trim().toLowerCase() !== normalizedOriginal)
+        .map(n => n!.trim().toLowerCase());
 
-      return filteredNames.map(n => n.toLowerCase()).includes(value)
+      return filteredNames.includes(value)
         ? { notUnique: true }
         : null;
     };

@@ -36,12 +36,10 @@ export class StarterComponent implements OnInit {
 
   displayedColumns: string[] = [
     'name',
-    'description',
     'basePath',
     'port',
     'status',
     'isPrivate',
-    'creationDate',
     'updateDate',
     'actions'
   ];

@@ -14,6 +14,7 @@ import { ClassModel, FindAllEntities } from 'src/app/models/proyect.model';
 import { MessageService } from 'src/app/services/message.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { EntityDiagramDialogComponent } from './entity-diagram-dialog/entity-diagram-dialog.component';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-entities',
@@ -24,7 +25,8 @@ import { EntityDiagramDialogComponent } from './entity-diagram-dialog/entity-dia
     CommonModule,
     ReactiveFormsModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    MatChipsModule
 
   ],
   templateUrl: './entities.component.html',
@@ -122,9 +124,9 @@ export class EntitiesComponent implements OnInit {
         next: (data) => {
           this.dialog.open(EntityDiagramDialogComponent, {
             data: data.plantUmlDiagram,
-            width: '900px',
+            width: '1000px',
             maxWidth: '1100px',
-            height: '500px'
+            height: '700px'
           });
         },
         error: () => {

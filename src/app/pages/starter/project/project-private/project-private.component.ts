@@ -34,12 +34,10 @@ export class ProjectPrivateComponent implements OnInit {
 
   displayedColumns: string[] = [
     'name',
-    'description',
     'basePath',
     'port',
     'status',
     'isPrivate',
-    'creationDate',
     'updateDate',
     'actions'
   ];

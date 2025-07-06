@@ -185,21 +185,23 @@
                 <th mat-header-cell *matHeaderCellDef>Adicional</th>
                 <td mat-cell *matCellDef="let col">
                   <ng-container [ngSwitch]="col.property.type">
-                    <span *ngSwitchCase="'STRING'">
+                    <mat-chip-set *ngSwitchCase="'STRING'">
                       @if (col.column.length) {
-                      Longitud: {{ col.column.length || '-' }}
+                      <mat-chip>Longitud: {{ col.column.length}}</mat-chip>
                       }
-
-                    </span>
-                    <span *ngSwitchCase="'BIG_DECIMAL'">
+                    </mat-chip-set>
+                    <mat-chip-set *ngSwitchCase="'BIG_DECIMAL'">
                       @if (col.column.precision) {
-                      Precisión: {{ col.column.precision || '-' }}
+                      <mat-chip>Precisión: {{ col.column.precision}}</mat-chip>
                       }
                       @if (col.column.scale) {
-                      Escala: {{ col.column.scale || '-' }}
+                      <mat-chip>Escala: {{ col.column.scale}}</mat-chip>
                       }
-
-                    </span>
+                    </mat-chip-set>
+                    <mat-chip-set>
+                      <mat-chip>Nuleable: {{ col.column.nullable? 'Si': 'No'}}</mat-chip>
+                      <mat-chip>Unico: {{ col.column.unique? 'Si': 'No'}}</mat-chip>
+                    </mat-chip-set>
                   </ng-container>
                 </td>
               </ng-container>
@@ -256,6 +258,20 @@
                 <th mat-header-cell *matHeaderCellDef>Visibilidad</th>
                 <td mat-cell *matCellDef="let rel">{{ rel.property.visibility }}</td>
               </ng-container>
+
+              <ng-container matColumnDef="adicional">
+                <th mat-header-cell *matHeaderCellDef>Adicional</th>
+                <td mat-cell *matCellDef="let col">
+                  <mat-chip-set>
+                    <mat-chip *ngIf="col.column.name">Nombre columna: {{ col.column.name}}</mat-chip>
+                      @if (col.relation.fetch) {
+                        <mat-chip>Fetch: {{ col.relation.fetch || '-' }}</mat-chip>
+                      }
+                    <mat-chip>Nuleable: {{ col.column.nullable? 'Si': 'No'}}</mat-chip>
+                    </mat-chip-set>
+                </td>
+              </ng-container>
+
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Acciones</th>
                 <td mat-cell *matCellDef="let rel; let i = index">

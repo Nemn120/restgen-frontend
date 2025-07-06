@@ -86,7 +86,7 @@ export class ProjectComponent implements OnInit {
           version: ['1.0.0-SNAPSHOT', [Validators.required, mavenVersionValidator()]]
         }),
         security: this.fb.group({
-          secretKey: ['']
+          secretKey: ['52daa81c4c48b896ff44f37ec3f938f133479271',[Validators.required, Validators.minLength(32), Validators.maxLength(64)]]
         })
       }),
 
